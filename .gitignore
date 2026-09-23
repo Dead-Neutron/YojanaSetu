@@ -1,1 +1,43 @@
+# Virtual Environment & Agent Config
 .venv/
+venv/
+.agents/
+
+# Local Sensitive / Large Data
+data/
+PLAN.md
+
+# Environment Credentials & Secrets
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+!.env.example
+
+# Node.js & Next.js Builds
+node_modules/
+.next/
+out/
+dist/
+build/
+*.tsbuildinfo
+next-env.d.ts
+
+# Python Artifacts & Caches
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Logs & OS System Files
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.DS_Store
+Thumbs.db
+Desktop.ini
