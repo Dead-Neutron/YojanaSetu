@@ -94,7 +94,7 @@ export default function HomePage() {
             </motion.div>
 
             {/* High-Impact Civic Metrics Strip */}
-            <div className="pt-10 grid grid-cols-2 sm:grid-cols-4 gap-4 max-w-4xl mx-auto border-t border-[#23487A] mt-12 text-left">
+            <div className="pt-10 grid grid-cols-2 sm:grid-cols-4 gap-4 max-w-4xl mx-auto border-t border-[#23487A] mt-12 text-center">
               <div className="p-4 rounded-xl bg-[#122844]/60 border border-[#23487A]">
                 <div className="text-2xl font-black text-white">3,400+</div>
                 <div className="text-xs font-semibold text-slate-300 mt-0.5">Central & State Schemes</div>
