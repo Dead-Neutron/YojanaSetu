@@ -4,7 +4,7 @@ venv/
 .agents/
 
 # Local Sensitive / Large Data
-data/
+dataset/
 PLAN.md
 
 # Environment Credentials & Secrets
