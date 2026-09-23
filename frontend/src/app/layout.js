@@ -1,7 +1,12 @@
+import { Inter } from "next/font/google";
 import "./globals.css";
 import { LanguageProvider } from "@/i18n/LanguageContext";
 import { AccessibilityProvider } from "@/context/AccessibilityContext";
-import AccessibilityDrawer from "@/components/AccessibilityDrawer";
+
+const inter = Inter({
+  subsets: ["latin"],
+  display: "swap",
+});
 
 export const metadata = {
   title: "YojanaSetu | Modern Citizen Welfare Access Portal",
@@ -11,15 +16,14 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" className="h-full">
+    <html lang="en" className={`h-full ${inter.className}`} suppressHydrationWarning>
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
       </head>
-      <body className="min-h-full flex flex-col antialiased bg-[#F8FAFC] text-[#0F172A]">
+      <body className="min-h-full flex flex-col antialiased bg-[#FFFFFF] text-[#171717]" suppressHydrationWarning>
         <LanguageProvider>
           <AccessibilityProvider>
             {children}
-            <AccessibilityDrawer />
           </AccessibilityProvider>
         </LanguageProvider>
       </body>

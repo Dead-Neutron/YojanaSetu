@@ -43,9 +43,9 @@ export default function HomePage() {
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3 }}
-              className="inline-flex items-center gap-2 bg-[#122844] text-[#FF9F00] border border-[#23487A] px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider shadow-sm"
+              className="inline-flex items-center gap-2 bg-[#122844] text-[#F59E0B] border border-[#23487A] px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider shadow-sm"
             >
-              <Sparkles className="w-4 h-4 text-[#FF9F00]" />
+              <Sparkles className="w-4 h-4 text-[#F59E0B]" />
               <span>{t("hero.badge")}</span>
             </motion.div>
 
@@ -78,7 +78,7 @@ export default function HomePage() {
             >
               <a
                 href="#bento-hub"
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 bg-[#FF9F00] hover:bg-[#E68F00] text-[#171717] font-bold px-7 py-3.5 rounded-xl text-base civic-shadow-md transition-all active:scale-95"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 bg-[#F59E0B] hover:bg-[#D97706] text-[#171717] font-bold px-7 py-3.5 rounded-xl text-base civic-shadow-md transition-all active:scale-95"
               >
                 <Mic className="w-5 h-5 stroke-[2.2]" />
                 <span>Try Voice Assistant</span>
@@ -104,7 +104,7 @@ export default function HomePage() {
                 <div className="text-xs font-semibold text-slate-300 mt-0.5">Direct Benefit Transfer</div>
               </div>
               <div className="p-4 rounded-xl bg-[#122844]/60 border border-[#23487A]">
-                <div className="text-2xl font-black text-[#FF9F00]">3 Dialects</div>
+                <div className="text-2xl font-black text-[#F59E0B]">3 Dialects</div>
                 <div className="text-xs font-semibold text-slate-300 mt-0.5">English, Hindi & Bengali</div>
               </div>
               <div className="p-4 rounded-xl bg-[#122844]/60 border border-[#23487A]">
@@ -136,10 +136,10 @@ export default function HomePage() {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="bg-[#F8F9FA] border border-[#E5E5E5] rounded-xl p-8 civic-shadow-sm hover:border-[#00A3C4] transition-all text-center flex flex-col items-center">
-              <div className="w-10 h-10 rounded-full bg-[#FFF6E6] text-[#FF9F00] font-bold text-sm flex items-center justify-center mb-5 border border-[#FF9F00]/30">
+              <div className="w-10 h-10 rounded-full bg-[#FEF3C7] text-[#F59E0B] font-bold text-sm flex items-center justify-center mb-5 border border-[#F59E0B]/30">
                 01
               </div>
-              <div className="w-16 h-16 rounded-xl bg-[#FFF6E6] text-[#FF9F00] flex items-center justify-center mb-5 border border-[#FF9F00]/30">
+              <div className="w-16 h-16 rounded-xl bg-[#FEF3C7] text-[#F59E0B] flex items-center justify-center mb-5 border border-[#F59E0B]/30">
                 <Mic className="w-8 h-8 stroke-[2.2]" />
               </div>
               <h3 className="text-xl font-bold text-[#171717] mb-2 tracking-tight">
@@ -217,12 +217,12 @@ export default function HomePage() {
 
               {/* Structural Dark Anchor Card */}
               <div className="bg-[#1A365D] text-white p-8 rounded-xl border border-[#23487A] space-y-6 shadow-md">
-                <h3 className="text-xl font-bold text-[#FF9F00] border-b border-[#23487A] pb-3">
+                <h3 className="text-xl font-bold text-[#F59E0B] border-b border-[#23487A] pb-3">
                   {t("about.cardTitle")}
                 </h3>
                 
                 <div className="flex items-start gap-4">
-                  <div className="p-3 bg-[#FF9F00] text-[#171717] rounded-xl shrink-0 font-bold">
+                  <div className="p-3 bg-[#F59E0B] text-[#171717] rounded-xl shrink-0 font-bold">
                     <Mic className="w-5 h-5" />
                   </div>
                   <div>
@@ -248,7 +248,7 @@ export default function HomePage() {
                 <div className="pt-2">
                   <Link
                     href="/search"
-                    className="block w-full text-center bg-[#FF9F00] hover:bg-[#E68F00] text-[#171717] font-bold py-3 rounded-xl text-sm transition-all shadow-sm"
+                    className="block w-full text-center bg-[#F59E0B] hover:bg-[#D97706] text-[#171717] font-bold py-3 rounded-xl text-sm transition-all shadow-sm"
                   >
                     {t("about.openSearch")}
                   </Link>

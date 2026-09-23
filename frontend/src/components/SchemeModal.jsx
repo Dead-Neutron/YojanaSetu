@@ -45,7 +45,7 @@ export default function SchemeModal({ scheme, onClose }) {
               </span>
               {scheme.state && (
                 <span className="text-xs bg-[#122844] text-[#00A3C4] px-3 py-0.5 rounded-full border border-[#23487A] flex items-center gap-1 font-medium">
-                  <MapPin className="w-3 h-3 text-[#FF9F00]" />
+                  <MapPin className="w-3 h-3 text-[#F59E0B]" />
                   <span>{scheme.state}</span>
                 </span>
               )}
@@ -101,7 +101,7 @@ export default function SchemeModal({ scheme, onClose }) {
           {scheme.eligibility && (
             <div>
               <h3 className="text-lg font-bold text-[#171717] border-b border-[#E5E5E5] pb-2 mb-2.5 flex items-center gap-2">
-                <AlertCircle className="w-5 h-5 text-[#FF9F00]" />
+                <AlertCircle className="w-5 h-5 text-[#F59E0B]" />
                 <span>{t("scheme.modalEligibility")}</span>
               </h3>
               <div className="bg-[#FFFFFF] border border-[#E5E5E5] rounded-xl p-4 text-base text-[#171717] leading-relaxed whitespace-pre-line">
@@ -117,7 +117,7 @@ export default function SchemeModal({ scheme, onClose }) {
                 <FileText className="w-5 h-5 text-[#00A3C4]" />
                 <span>{t("scheme.modalDocuments")}</span>
               </h3>
-              <div className="bg-[#FFF6E6] border border-[#FF9F00]/30 rounded-xl p-4 text-base text-[#171717] leading-relaxed whitespace-pre-line">
+              <div className="bg-[#FEF3C7] border border-[#F59E0B]/30 rounded-xl p-4 text-base text-[#171717] leading-relaxed whitespace-pre-line">
                 {scheme.documents}
               </div>
             </div>
@@ -161,7 +161,7 @@ export default function SchemeModal({ scheme, onClose }) {
               onClick={() => {
                 alert(`Redirecting to the official application portal for ${scheme.scheme_name}.`);
               }}
-              className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-[#FF9F00] hover:bg-[#E68F00] text-[#171717] font-bold text-sm flex items-center justify-center gap-2 shadow-sm transition-all"
+              className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-[#F59E0B] hover:bg-[#D97706] text-[#171717] font-bold text-sm flex items-center justify-center gap-2 shadow-sm transition-all"
             >
               <span>{t("scheme.applyOnline")}</span>
               <ExternalLink className="w-4 h-4" />

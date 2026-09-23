@@ -116,7 +116,7 @@ export default function VoiceAssistant() {
   const audioContextRef = useRef(null);
   const animationFrameRef = useRef(null);
   const audioPlayerRef = useRef(null);
-  const synthRef = useRef(typeof window !== "undefined" ? window.speechSynthesis : null);
+  const synthRef = useRef(null);
 
   const sampleQueries = SAMPLE_QUERIES_BY_LANG[language] || SAMPLE_QUERIES_BY_LANG.en;
 
@@ -128,6 +128,9 @@ export default function VoiceAssistant() {
   };
 
   useEffect(() => {
+    if (typeof window !== "undefined" && window.speechSynthesis) {
+      synthRef.current = window.speechSynthesis;
+    }
     return () => {
       stopAudioCapture();
       if (synthRef.current) synthRef.current.cancel();
@@ -339,8 +342,8 @@ export default function VoiceAssistant() {
       {/* Modern Civic Card (Deep Saturated Indigo, soft rounded-xl, subtle border) */}
       <div className="bg-[#1A365D] border border-[#23487A] rounded-xl p-8 sm:p-12 text-white shadow-2xl text-center relative overflow-hidden">
         {/* Top Badge */}
-        <div className="inline-flex items-center gap-2 bg-[#122844] text-[#FF9F00] border border-[#23487A] px-4 py-1.5 rounded-full font-semibold text-xs tracking-wide mb-6">
-          <Sparkles className="w-3.5 h-3.5 text-[#FF9F00]" />
+        <div className="inline-flex items-center gap-2 bg-[#122844] text-[#F59E0B] border border-[#23487A] px-4 py-1.5 rounded-full font-semibold text-xs tracking-wide mb-6">
+          <Sparkles className="w-3.5 h-3.5 text-[#F59E0B]" />
           <span>{t("hero.badge")}</span>
         </div>
 
@@ -359,7 +362,7 @@ export default function VoiceAssistant() {
               type="button"
               id="voice-mic-main-button"
               onClick={handleStartListening}
-              className="w-32 h-32 sm:w-36 sm:h-36 rounded-full bg-[#FF9F00] hover:bg-[#E68F00] text-[#171717] flex flex-col items-center justify-center border-4 border-[#FFD080] civic-shadow-lg transition-all active:scale-95 animate-civic-mic"
+              className="w-32 h-32 sm:w-36 sm:h-36 rounded-full bg-[#F59E0B] hover:bg-[#D97706] text-[#171717] flex flex-col items-center justify-center border-4 border-[#FCD34D] civic-shadow-lg transition-all active:scale-95 animate-civic-mic"
               aria-label={t("hero.tapToSpeak")}
             >
               <Mic className="w-12 h-12 mb-1 stroke-[2.2]" />
@@ -382,11 +385,11 @@ export default function VoiceAssistant() {
               {/* 7-Bar Modern Dynamic Equalizer in Electric Cyan and Marigold */}
               <div className="flex items-center gap-1.5 mt-6 h-12" aria-label="Audio Visualizer">
                 <div className="w-2 bg-[#00A3C4] rounded-full animate-civic-eq-1"></div>
-                <div className="w-2 bg-[#FF9F00] rounded-full animate-civic-eq-2"></div>
+                <div className="w-2 bg-[#F59E0B] rounded-full animate-civic-eq-2"></div>
                 <div className="w-2 bg-[#00A3C4] rounded-full animate-civic-eq-3"></div>
-                <div className="w-2 bg-[#FF9F00] rounded-full animate-civic-eq-4"></div>
+                <div className="w-2 bg-[#F59E0B] rounded-full animate-civic-eq-4"></div>
                 <div className="w-2 bg-[#00A3C4] rounded-full animate-civic-eq-5"></div>
-                <div className="w-2 bg-[#FF9F00] rounded-full animate-civic-eq-6"></div>
+                <div className="w-2 bg-[#F59E0B] rounded-full animate-civic-eq-6"></div>
                 <div className="w-2 bg-[#00A3C4] rounded-full animate-civic-eq-7"></div>
               </div>
               <span className="text-sm font-semibold text-[#00A3C4] mt-2">
@@ -426,7 +429,7 @@ export default function VoiceAssistant() {
                 <button
                   type="button"
                   onClick={handleReplay}
-                  className="bg-[#FF9F00] hover:bg-[#E68F00] text-[#171717] px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all"
+                  className="bg-[#F59E0B] hover:bg-[#D97706] text-[#171717] px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all"
                 >
                   <RotateCcw className="w-3.5 h-3.5" />
                   <span>{t("hero.replayVoice")}</span>
@@ -457,7 +460,7 @@ export default function VoiceAssistant() {
                 onClick={() => handleSelectQuickQuery(item)}
                 className="bg-[#122844] hover:bg-[#23487A] text-slate-100 hover:text-white px-4 py-2 rounded-xl text-xs font-semibold border border-[#23487A] flex items-center gap-2 transition-all active:scale-95 civic-shadow-sm"
               >
-                <Mic className="w-3.5 h-3.5 text-[#FF9F00] shrink-0" />
+                <Mic className="w-3.5 h-3.5 text-[#F59E0B] shrink-0" />
                 <span>{item.title}</span>
               </button>
             ))}
@@ -478,7 +481,7 @@ export default function VoiceAssistant() {
             <button
               type="button"
               onClick={handleReplay}
-              className="inline-flex items-center gap-1.5 bg-[#FF9F00] hover:bg-[#E68F00] text-[#171717] px-3 py-1.5 rounded-xl font-bold text-xs self-start sm:self-auto transition-all"
+              className="inline-flex items-center gap-1.5 bg-[#F59E0B] hover:bg-[#D97706] text-[#171717] px-3 py-1.5 rounded-xl font-bold text-xs self-start sm:self-auto transition-all"
             >
               <RotateCcw className="w-3.5 h-3.5" />
               <span>{t("hero.replayVoice")}</span>

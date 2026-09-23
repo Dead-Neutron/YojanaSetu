@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Phone, CheckCircle2, Handshake } from "lucide-react";
+import { Phone, CheckCircle2 } from "lucide-react";
 import { useLanguage } from "@/i18n/LanguageContext";
 
 export default function Footer() {
@@ -11,12 +11,12 @@ export default function Footer() {
       <div className="bg-[#1A365D] border-b border-[#23487A] py-8 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 text-sm">
           <div className="flex items-start gap-3.5 bg-[#122844] p-4 rounded-xl border border-[#23487A]">
-            <div className="p-2.5 bg-[#FF9F00]/20 text-[#FF9F00] rounded-lg shrink-0">
+            <div className="p-2.5 bg-[#F59E0B]/20 text-[#F59E0B] rounded-lg shrink-0">
               <Phone className="w-5 h-5" />
             </div>
             <div>
               <div className="text-white font-bold">{t("footer.nationalHelpline")}</div>
-              <div className="text-[#FF9F00] font-extrabold text-base tracking-wide">1800-11-2001</div>
+              <div className="text-[#F59E0B] font-extrabold text-base tracking-wide">1800-11-2001</div>
               <div className="text-xs text-slate-300 mt-0.5">{t("nav.tollFree")}, 24x7</div>
             </div>
           </div>
@@ -33,12 +33,12 @@ export default function Footer() {
           </div>
 
           <div className="flex items-start gap-3.5 bg-[#122844] p-4 rounded-xl border border-[#23487A]">
-            <div className="p-2.5 bg-[#FF9F00]/20 text-[#FF9F00] rounded-lg shrink-0">
+            <div className="p-2.5 bg-[#F59E0B]/20 text-[#F59E0B] rounded-lg shrink-0">
               <Phone className="w-5 h-5" />
             </div>
             <div>
               <div className="text-white font-bold">{t("footer.healthHelpline")}</div>
-              <div className="text-[#FF9F00] font-extrabold text-base tracking-wide">14555</div>
+              <div className="text-[#F59E0B] font-extrabold text-base tracking-wide">14555</div>
               <div className="text-xs text-slate-300 mt-0.5">{t("nav.tollFree")}</div>
             </div>
           </div>
@@ -62,10 +62,7 @@ export default function Footer() {
           {/* Platform Info */}
           <div className="space-y-4">
             <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 bg-[#FF9F00] text-[#171717] rounded-lg flex items-center justify-center">
-                <Handshake className="w-5 h-5 stroke-[2.2]" />
-              </div>
-              <span className="text-xl font-black text-white">{t("nav.title")}</span>
+              <span className="text-xl font-black text-white tracking-tight">{t("nav.title")}</span>
             </div>
             <p className="text-sm text-slate-300 leading-relaxed">
               {t("footer.platformDesc")}
@@ -134,7 +131,7 @@ export default function Footer() {
               {t("footer.integrityDesc")}
             </p>
             <div className="text-[11px] text-slate-400 pt-2">
-              All schemes reference authentic <code className="text-[#FF9F00] font-bold">.gov.in</code> official resources.
+              All schemes reference authentic <code className="text-[#F59E0B] font-bold">.gov.in</code> official resources.
             </div>
           </div>
         </div>
@@ -142,7 +139,7 @@ export default function Footer() {
         {/* Bottom Strip */}
         <div className="mt-10 pt-6 border-t border-[#23487A] flex flex-col sm:flex-row items-center justify-between text-xs text-slate-400">
           <div>
-            © {new Date().getFullYear()} {t("footer.copyright")}
+            © 2026 {t("footer.copyright")}
           </div>
           <div className="flex items-center gap-4 mt-2 sm:mt-0">
             <span>WCAG AAA Accessible</span>

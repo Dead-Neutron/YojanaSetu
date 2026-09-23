@@ -167,7 +167,7 @@ export default function SearchPage() {
         <div className="max-w-7xl mx-auto space-y-5">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
-              <span className="text-xs font-bold bg-[#122844] text-[#FF9F00] border border-[#23487A] px-3 py-1 rounded-full uppercase tracking-wider">
+              <span className="text-xs font-bold bg-[#122844] text-[#F59E0B] border border-[#23487A] px-3 py-1 rounded-full uppercase tracking-wider">
                 {t("search.badge")}
               </span>
               <h1 className="text-3xl sm:text-4xl font-black text-white mt-2 tracking-tight">
@@ -184,7 +184,7 @@ export default function SearchPage() {
                 type="button"
                 onClick={() => setSelectedLevel("All")}
                 className={`px-4 py-2 rounded-lg text-xs font-bold transition-all ${
-                  selectedLevel === "All" ? "bg-[#FF9F00] text-[#171717] shadow-sm" : "text-slate-200 hover:text-white"
+                  selectedLevel === "All" ? "bg-[#F59E0B] text-[#171717] shadow-sm" : "text-slate-200 hover:text-white"
                 }`}
               >
                 {t("search.allSchemes")} ({allSchemes.length})
@@ -193,7 +193,7 @@ export default function SearchPage() {
                 type="button"
                 onClick={() => setSelectedLevel("Central")}
                 className={`px-4 py-2 rounded-lg text-xs font-bold transition-all ${
-                  selectedLevel === "Central" ? "bg-[#FF9F00] text-[#171717] shadow-sm" : "text-slate-200 hover:text-white"
+                  selectedLevel === "Central" ? "bg-[#F59E0B] text-[#171717] shadow-sm" : "text-slate-200 hover:text-white"
                 }`}
               >
                 {t("search.centralSchemes")}
@@ -202,7 +202,7 @@ export default function SearchPage() {
                 type="button"
                 onClick={() => setSelectedLevel("State")}
                 className={`px-4 py-2 rounded-lg text-xs font-bold transition-all ${
-                  selectedLevel === "State" ? "bg-[#FF9F00] text-[#171717] shadow-sm" : "text-slate-200 hover:text-white"
+                  selectedLevel === "State" ? "bg-[#F59E0B] text-[#171717] shadow-sm" : "text-slate-200 hover:text-white"
                 }`}
               >
                 {t("search.stateSchemes")}
@@ -246,7 +246,7 @@ export default function SearchPage() {
             onClick={() => setMobileFilterOpen(true)}
             className="flex items-center gap-2 bg-[#1A365D] text-white px-4 py-2.5 rounded-xl text-sm font-bold border border-[#23487A]"
           >
-            <Filter className="w-4 h-4 text-[#FF9F00]" />
+            <Filter className="w-4 h-4 text-[#F59E0B]" />
             <span>{t("search.filters")} ({activeFiltersCount})</span>
           </button>
           <span className="text-sm font-semibold text-[#171717]">
@@ -421,7 +421,7 @@ export default function SearchPage() {
               </div>
             ) : (
               <div className="bg-[#F8F9FA] border border-[#E5E5E5] rounded-xl p-12 text-center space-y-4 civic-shadow-sm">
-                <div className="w-14 h-14 bg-[#FFF6E6] text-[#FF9F00] rounded-xl flex items-center justify-center mx-auto text-xl font-bold border border-[#FF9F00]/30">
+                <div className="w-14 h-14 bg-[#FFF6E6] text-[#F59E0B] rounded-xl flex items-center justify-center mx-auto text-xl font-bold border border-[#F59E0B]/30">
                   !
                 </div>
                 <h3 className="text-2xl font-bold text-[#171717] tracking-tight">
@@ -433,7 +433,7 @@ export default function SearchPage() {
                 <button
                   type="button"
                   onClick={handleResetFilters}
-                  className="bg-[#FF9F00] hover:bg-[#E68F00] text-[#171717] font-bold px-5 py-2.5 rounded-xl text-sm transition-all civic-shadow-sm"
+                  className="bg-[#F59E0B] hover:bg-[#D97706] text-[#171717] font-bold px-5 py-2.5 rounded-xl text-sm transition-all civic-shadow-sm"
                 >
                   {t("search.clearFilters")}
                 </button>
@@ -519,7 +519,7 @@ export default function SearchPage() {
               <button
                 type="button"
                 onClick={() => setMobileFilterOpen(false)}
-                className="w-full bg-[#FF9F00] hover:bg-[#E68F00] text-[#171717] py-3 rounded-xl font-bold text-sm shadow-sm"
+                className="w-full bg-[#F59E0B] hover:bg-[#D97706] text-[#171717] py-3 rounded-xl font-bold text-sm shadow-sm"
               >
                 {t("search.applyFilters", { count: filteredSchemes.length })}
               </button>

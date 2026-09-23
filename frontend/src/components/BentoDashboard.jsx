@@ -52,7 +52,7 @@ export default function BentoDashboard() {
 
         <Link
           href="/search"
-          className="inline-flex items-center gap-2 bg-[#FF9F00] hover:bg-[#E68F00] text-[#171717] px-5 py-2.5 rounded-xl font-bold text-sm shadow-sm transition-all hover:shadow"
+          className="inline-flex items-center gap-2 bg-[#F59E0B] hover:bg-[#D97706] text-[#171717] px-5 py-2.5 rounded-xl font-bold text-sm shadow-sm transition-all hover:shadow"
         >
           <Search className="w-4 h-4 text-[#171717]" />
           <span>{t("nav.searchSchemes")}</span>
@@ -110,7 +110,7 @@ export default function BentoDashboard() {
                 <div className="text-xs font-semibold text-[#525252]">States & UTs</div>
               </div>
               <div>
-                <div className="text-2xl font-black text-[#FF9F00]">₹0</div>
+                <div className="text-2xl font-black text-[#F59E0B]">₹0</div>
                 <div className="text-xs font-semibold text-[#525252]">Application Fees</div>
               </div>
             </div>
@@ -276,10 +276,10 @@ export default function BentoDashboard() {
         >
           <div>
             <div className="flex items-center justify-between mb-4">
-              <span className="text-xs font-bold text-[#FF9F00] bg-[#122844] px-3 py-1 rounded-full uppercase tracking-wider border border-[#23487A]">
+              <span className="text-xs font-bold text-[#F59E0B] bg-[#122844] px-3 py-1 rounded-full uppercase tracking-wider border border-[#23487A]">
                 WCAG 2.2 AAA
               </span>
-              <Award className="w-5 h-5 text-[#FF9F00]" />
+              <Award className="w-5 h-5 text-[#F59E0B]" />
             </div>
 
             <h3 className="text-lg font-bold text-white tracking-tight">
@@ -292,8 +292,8 @@ export default function BentoDashboard() {
 
           <div className="mt-6 pt-4 border-t border-[#23487A] space-y-2">
             <div className="text-xs text-slate-300 font-semibold">Toll-Free National Helpline:</div>
-            <div className="text-lg font-black text-[#FF9F00] tracking-wide flex items-center gap-2">
-              <Phone className="w-4 h-4 text-[#FF9F00]" />
+            <div className="text-lg font-black text-[#F59E0B] tracking-wide flex items-center gap-2">
+              <Phone className="w-4 h-4 text-[#F59E0B]" />
               <span>1800-11-2001</span>
             </div>
           </div>

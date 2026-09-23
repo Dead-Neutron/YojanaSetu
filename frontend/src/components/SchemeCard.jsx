@@ -90,7 +90,7 @@ export default function SchemeCard({ scheme, onSelect }) {
         <button
           type="button"
           onClick={() => onSelect(scheme)}
-          className="inline-flex items-center gap-2 bg-[#FF9F00] hover:bg-[#E68F00] text-[#171717] font-bold px-4 py-2 rounded-xl text-sm transition-all civic-shadow-sm hover:civic-shadow-md"
+          className="inline-flex items-center gap-2 bg-[#F59E0B] hover:bg-[#D97706] text-[#171717] font-bold px-4 py-2 rounded-xl text-sm transition-all civic-shadow-sm hover:civic-shadow-md"
           aria-label={`View details for ${scheme.scheme_name}`}
         >
           <span>{t("scheme.viewDetails")}</span>

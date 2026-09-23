@@ -16,7 +16,7 @@ if (!i18n.isInitialized) {
       hi: { translation: hiTranslations },
       bn: { translation: bnTranslations },
     },
-    lng: "en", // Default language is English as requested
+    lng: "en", // Default language is English
     fallbackLng: "en",
     interpolation: {
       escapeValue: false, // React already escapes values
@@ -38,14 +38,19 @@ const LanguageContext = createContext({
 });
 
 export function LanguageProvider({ children }) {
+  const [mounted, setMounted] = useState(false);
   const [language, setLanguageState] = useState("en");
 
   useEffect(() => {
-    // Check local storage for user's previous preference
-    const saved = localStorage.getItem("yojanasetu_lang");
-    if (saved && ["en", "hi", "bn"].includes(saved)) {
-      setLanguageState(saved);
-      i18n.changeLanguage(saved);
+    setMounted(true);
+    try {
+      const saved = localStorage.getItem("yojanasetu_lang");
+      if (saved && ["en", "hi", "bn"].includes(saved)) {
+        setLanguageState(saved);
+        i18n.changeLanguage(saved);
+      }
+    } catch (e) {
+      // ignore
     }
   }, []);
 
@@ -62,8 +67,11 @@ export function LanguageProvider({ children }) {
   };
 
   const t = (key, params = {}) => {
-    let result = i18n.t(key, params);
-    return result;
+    // During SSR and initial client hydration, guarantee pure English to avoid hydration mismatch
+    if (!mounted) {
+      return i18n.t(key, { ...params, lng: "en" });
+    }
+    return i18n.t(key, params);
   };
 
   return (
