@@ -1,214 +1,246 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
+import { motion } from "framer-motion";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import VoiceAssistant from "@/components/VoiceAssistant";
+import BentoDashboard from "@/components/BentoDashboard";
+import { useLanguage } from "@/i18n/LanguageContext";
 import { 
   Mic, 
   Search, 
   Sparkles, 
   Volume2, 
-  FileCheck2, 
-  ShieldCheck, 
-  Users, 
-  ArrowRight, 
-  HeartHandshake,
-  CheckCircle,
-  HelpCircle
+  CheckCircle2
 } from "lucide-react";
 
 export default function HomePage() {
-  const [currentLang, setCurrentLang] = useState("hi");
+  const { t } = useLanguage();
 
   return (
-    <div className="min-h-screen flex flex-col bg-slate-100">
-      {/* Top Navbar */}
-      <Navbar currentLang={currentLang} onLangChange={setCurrentLang} />
+    <div className="min-h-screen flex flex-col bg-[#FFFFFF]">
+      {/* Top Navbar with unmixed languages & accessibility */}
+      <Navbar />
 
-      {/* Main Content */}
       <main className="flex-1">
-        {/* Voice-First Hero Interface */}
-        <section className="bg-slate-900 border-b-4 border-[#D97706] py-6 sm:py-10">
-          <VoiceAssistant currentLang={currentLang} />
+        {/* Modern Civic Hero Section (Deep Saturated Indigo, SVG Grid Backdrop) */}
+        <section className="relative bg-[#1A365D] text-white py-20 px-4 sm:px-6 lg:px-8 overflow-hidden border-b border-[#23487A]">
+          {/* Geometric Civic Grid Background Pattern (Clean SVG) */}
+          <div className="absolute inset-0 opacity-10 pointer-events-none" aria-hidden="true">
+            <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
+              <defs>
+                <pattern id="civic-grid" width="48" height="48" patternUnits="userSpaceOnUse">
+                  <path d="M 48 0 L 0 0 0 48" fill="none" stroke="#FFFFFF" strokeWidth="1" />
+                </pattern>
+              </defs>
+              <rect width="100%" height="100%" fill="url(#civic-grid)" />
+            </svg>
+          </div>
+
+          <div className="max-w-5xl mx-auto text-center relative z-10 space-y-6">
+            {/* Pill Badge */}
+            <motion.div 
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3 }}
+              className="inline-flex items-center gap-2 bg-[#122844] text-[#FF9F00] border border-[#23487A] px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider shadow-sm"
+            >
+              <Sparkles className="w-4 h-4 text-[#FF9F00]" />
+              <span>{t("hero.badge")}</span>
+            </motion.div>
+
+            {/* Main Headline */}
+            <motion.h1 
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, delay: 0.1 }}
+              className="text-4xl sm:text-6xl font-black text-white tracking-tight leading-tight max-w-4xl mx-auto"
+            >
+              {t("hero.title")}
+            </motion.h1>
+
+            {/* Subtitle with 7:1 Contrast Safety */}
+            <motion.p 
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, delay: 0.15 }}
+              className="text-lg sm:text-xl text-slate-200 max-w-3xl mx-auto leading-relaxed font-normal"
+            >
+              {t("hero.subtitle")}
+            </motion.p>
+
+            {/* Primary Action Buttons */}
+            <motion.div 
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, delay: 0.2 }}
+              className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4"
+            >
+              <a
+                href="#bento-hub"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 bg-[#FF9F00] hover:bg-[#E68F00] text-[#171717] font-bold px-7 py-3.5 rounded-xl text-base civic-shadow-md transition-all active:scale-95"
+              >
+                <Mic className="w-5 h-5 stroke-[2.2]" />
+                <span>Try Voice Assistant</span>
+              </a>
+
+              <Link
+                href="/search"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 bg-[#122844] hover:bg-[#23487A] text-white font-bold px-7 py-3.5 rounded-xl text-base border border-[#23487A] transition-all shadow-sm"
+              >
+                <Search className="w-5 h-5 text-[#00A3C4]" />
+                <span>Browse Scheme Directory</span>
+              </Link>
+            </motion.div>
+
+            {/* High-Impact Civic Metrics Strip */}
+            <div className="pt-10 grid grid-cols-2 sm:grid-cols-4 gap-4 max-w-4xl mx-auto border-t border-[#23487A] mt-12 text-left">
+              <div className="p-4 rounded-xl bg-[#122844]/60 border border-[#23487A]">
+                <div className="text-2xl font-black text-white">3,400+</div>
+                <div className="text-xs font-semibold text-slate-300 mt-0.5">Central & State Schemes</div>
+              </div>
+              <div className="p-4 rounded-xl bg-[#122844]/60 border border-[#23487A]">
+                <div className="text-2xl font-black text-[#00A3C4]">100%</div>
+                <div className="text-xs font-semibold text-slate-300 mt-0.5">Direct Benefit Transfer</div>
+              </div>
+              <div className="p-4 rounded-xl bg-[#122844]/60 border border-[#23487A]">
+                <div className="text-2xl font-black text-[#FF9F00]">3 Dialects</div>
+                <div className="text-xs font-semibold text-slate-300 mt-0.5">English, Hindi & Bengali</div>
+              </div>
+              <div className="p-4 rounded-xl bg-[#122844]/60 border border-[#23487A]">
+                <div className="text-2xl font-black text-white">WCAG 2.2</div>
+                <div className="text-xs font-semibold text-slate-300 mt-0.5">AAA Accessibility Rated</div>
+              </div>
+            </div>
+          </div>
         </section>
 
-        {/* How It Works - 3 Step Visual Guide for Low-Literacy Inclusion */}
-        <section className="py-14 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-          <div className="text-center max-w-3xl mx-auto mb-12">
-            <span className="text-xs font-black bg-[#047857] text-white px-3 py-1 rounded uppercase tracking-wider">
-              सरल एवं सुगम प्रक्रिया | 3-Step Simple Process
+        {/* Main Section: Interactive Bento Box Dashboard */}
+        <section id="bento-hub" className="bg-[#FFFFFF] py-12 scroll-mt-20">
+          <BentoDashboard />
+        </section>
+
+        {/* 3-Step Simple Process Section */}
+        <section className="py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto border-t border-[#E5E5E5]">
+          <div className="text-center max-w-2xl mx-auto mb-12">
+            <span className="text-xs font-bold bg-[#E6F7FA] text-[#00829D] border border-[#00A3C4]/30 px-3.5 py-1 rounded-full uppercase tracking-wider">
+              {t("steps.badge")}
             </span>
-            <h2 className="text-3xl sm:text-4xl font-black text-slate-950 mt-3">
-              बिना किसी परेशानी के सरकारी सहायता कैसे पाएं?
+            <h2 className="text-3xl sm:text-4xl font-black text-[#171717] mt-3 tracking-tight">
+              {t("steps.title")}
             </h2>
-            <p className="text-lg text-slate-700 mt-2 font-medium">
-              Neither form-filling complexity nor language barrier should prevent you from receiving government benefits.
+            <p className="text-base text-[#404040] mt-2 leading-relaxed font-medium">
+              {t("steps.subtitle")}
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {/* Step 1 */}
-            <div className="bg-white border-2 border-slate-300 rounded-xl p-8 shadow-sm text-center relative flex flex-col items-center">
-              <div className="w-10 h-10 rounded-full bg-[#D97706] text-slate-950 font-black text-lg flex items-center justify-center absolute -top-5">
-                1
+            <div className="bg-[#F8F9FA] border border-[#E5E5E5] rounded-xl p-8 civic-shadow-sm hover:border-[#00A3C4] transition-all text-center flex flex-col items-center">
+              <div className="w-10 h-10 rounded-full bg-[#FFF6E6] text-[#FF9F00] font-bold text-sm flex items-center justify-center mb-5 border border-[#FF9F00]/30">
+                01
               </div>
-              <div className="w-20 h-20 rounded-full bg-amber-100 text-amber-900 flex items-center justify-center mb-6 mt-2">
-                <Mic className="w-10 h-10" />
+              <div className="w-16 h-16 rounded-xl bg-[#FFF6E6] text-[#FF9F00] flex items-center justify-center mb-5 border border-[#FF9F00]/30">
+                <Mic className="w-8 h-8 stroke-[2.2]" />
               </div>
-              <h3 className="text-xl font-black text-slate-900 mb-2">
-                माइक दबाएं और बोलें (Speak)
+              <h3 className="text-xl font-bold text-[#171717] mb-2 tracking-tight">
+                {t("steps.step1Title")}
               </h3>
-              <p className="text-base text-slate-700 leading-relaxed">
-                Click the microphone button and simply talk about your background, occupation, family, or immediate financial need in your mother tongue.
+              <p className="text-sm text-[#404040] leading-relaxed font-medium">
+                {t("steps.step1Desc")}
               </p>
             </div>
 
-            {/* Step 2 */}
-            <div className="bg-white border-2 border-slate-300 rounded-xl p-8 shadow-sm text-center relative flex flex-col items-center">
-              <div className="w-10 h-10 rounded-full bg-[#047857] text-white font-black text-lg flex items-center justify-center absolute -top-5">
-                2
+            <div className="bg-[#F8F9FA] border border-[#E5E5E5] rounded-xl p-8 civic-shadow-sm hover:border-[#00A3C4] transition-all text-center flex flex-col items-center">
+              <div className="w-10 h-10 rounded-full bg-[#E6F7FA] text-[#00A3C4] font-bold text-sm flex items-center justify-center mb-5 border border-[#00A3C4]/30">
+                02
               </div>
-              <div className="w-20 h-20 rounded-full bg-emerald-100 text-emerald-900 flex items-center justify-center mb-6 mt-2">
-                <Sparkles className="w-10 h-10" />
+              <div className="w-16 h-16 rounded-xl bg-[#E6F7FA] text-[#00A3C4] flex items-center justify-center mb-5 border border-[#00A3C4]/30">
+                <Sparkles className="w-8 h-8 stroke-[2.2]" />
               </div>
-              <h3 className="text-xl font-black text-slate-900 mb-2">
-                AI योजना मिलान (AI Matching)
+              <h3 className="text-xl font-bold text-[#171717] mb-2 tracking-tight">
+                {t("steps.step2Title")}
               </h3>
-              <p className="text-base text-slate-700 leading-relaxed">
-                Gemini Flash AI extracts your demographic criteria and scans verified Central & State databases via Tiger Data hybrid vector RAG.
+              <p className="text-sm text-[#404040] leading-relaxed font-medium">
+                {t("steps.step2Desc")}
               </p>
             </div>
 
-            {/* Step 3 */}
-            <div className="bg-white border-2 border-slate-300 rounded-xl p-8 shadow-sm text-center relative flex flex-col items-center">
-              <div className="w-10 h-10 rounded-full bg-[#0F172A] text-white font-black text-lg flex items-center justify-center absolute -top-5">
-                3
+            <div className="bg-[#F8F9FA] border border-[#E5E5E5] rounded-xl p-8 civic-shadow-sm hover:border-[#00A3C4] transition-all text-center flex flex-col items-center">
+              <div className="w-10 h-10 rounded-full bg-[#E6F7FA] text-[#1A365D] font-bold text-sm flex items-center justify-center mb-5 border border-[#1A365D]/20">
+                03
               </div>
-              <div className="w-20 h-20 rounded-full bg-slate-100 text-slate-900 flex items-center justify-center mb-6 mt-2">
-                <Volume2 className="w-10 h-10" />
+              <div className="w-16 h-16 rounded-xl bg-[#FFFFFF] text-[#1A365D] flex items-center justify-center mb-5 border border-[#E5E5E5]">
+                <Volume2 className="w-8 h-8 stroke-[2.2]" />
               </div>
-              <h3 className="text-xl font-black text-slate-900 mb-2">
-                आवाज़ में सुनें और आवेदन करें (Listen & Apply)
+              <h3 className="text-xl font-bold text-[#171717] mb-2 tracking-tight">
+                {t("steps.step3Title")}
               </h3>
-              <p className="text-base text-slate-700 leading-relaxed">
-                Listen to the spoken regional response streamed via ElevenLabs, read along with high-contrast text, and apply directly through verified portals.
+              <p className="text-sm text-[#404040] leading-relaxed font-medium">
+                {t("steps.step3Desc")}
               </p>
             </div>
           </div>
         </section>
 
-        {/* Popular Categories Grid */}
-        <section id="categories" className="bg-slate-200/70 border-y-2 border-slate-300 py-14 px-4 sm:px-6 lg:px-8">
-          <div className="max-w-7xl mx-auto">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
-              <div>
-                <h2 className="text-2xl sm:text-3xl font-black text-slate-950">
-                  प्रमुख कल्याणकारी श्रेणियां / Key Citizen Categories
-                </h2>
-                <p className="text-base text-slate-700 font-medium">
-                  Direct portals tailored to specific life needs and occupations
-                </p>
-              </div>
-
-              <Link
-                href="/search"
-                className="inline-flex items-center gap-2 bg-[#0F172A] hover:bg-slate-800 text-white px-5 py-2.5 rounded font-black text-sm self-start sm:self-auto"
-              >
-                <span>View All Schemes / पूरी सूची देखें</span>
-                <ArrowRight className="w-4 h-4" />
-              </Link>
-            </div>
-
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-              {[
-                { title: "कृषि एवं किसान", en: "Agriculture", icon: "🌾", desc: "PM-Kisan, Subsidies" },
-                { title: "महिला एवं बाल", en: "Women & Child", icon: "👩", desc: "Loans, Matritva" },
-                { title: "शिक्षा एवं छात्रवृत्ति", en: "Education", icon: "🎓", desc: "Scholarships, AICTE" },
-                { title: "श्रमिक एवं कारीगर", en: "Workers & Artisans", icon: "🔨", desc: "Toolkits, Insurance" },
-                { title: "स्वास्थ्य सहायता", en: "Healthcare", icon: "🏥", desc: "Ayushman, Medical" },
-                { title: "व्यापार एवं MSME", en: "Business", icon: "💼", desc: "PMEGP, Consortia" },
-              ].map((cat, idx) => (
-                <Link
-                  key={idx}
-                  href={`/search`}
-                  className="bg-white border-2 border-slate-300 hover:border-amber-600 rounded-lg p-5 text-center flex flex-col items-center justify-between shadow-sm hover:shadow transition-all group"
-                >
-                  <div className="text-3xl mb-2">{cat.icon}</div>
-                  <div className="font-black text-slate-900 text-sm group-hover:text-amber-700">
-                    {cat.title}
-                  </div>
-                  <div className="text-xs font-semibold text-slate-500 mt-1">
-                    {cat.en}
-                  </div>
-                  <div className="text-[11px] text-emerald-800 font-bold bg-emerald-50 px-2 py-0.5 rounded mt-3 border border-emerald-200">
-                    {cat.desc}
-                  </div>
-                </Link>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* About & Trust Section */}
-        <section id="about" className="py-14 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-          <div className="bg-white border-4 border-slate-300 rounded-2xl p-8 sm:p-12 shadow-sm">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+        {/* Mission & About Section */}
+        <section id="about" className="py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto border-t border-[#E5E5E5]">
+          <div className="bg-[#F8F9FA] border border-[#E5E5E5] rounded-xl p-8 sm:p-12 civic-shadow-sm">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
               <div className="space-y-4">
-                <span className="text-xs font-black bg-amber-100 text-amber-950 px-3 py-1 rounded uppercase tracking-wider border border-amber-300">
-                  Mission YojanaSetu
+                <span className="text-xs font-bold bg-[#E6F7FA] text-[#00829D] px-3 py-1 rounded-full uppercase tracking-wider border border-[#00A3C4]/30">
+                  {t("about.badge")}
                 </span>
-                <h2 className="text-3xl font-black text-slate-950 leading-tight">
-                  हर भारतीय नागरिक तक जन-कल्याणकारी योजनाओं की सीधी पहुंच
+                <h2 className="text-3xl font-black text-[#171717] leading-tight tracking-tight">
+                  {t("about.title")}
                 </h2>
-                <p className="text-base text-slate-700 leading-relaxed">
-                  Millions of eligible citizens across rural and semi-urban India miss out on entitled subsidies, pensions, and medical grants simply because portal interfaces are English-dominated, form-heavy, and require digital literacy.
+                <p className="text-base text-[#404040] leading-relaxed font-medium">
+                  {t("about.p1")}
                 </p>
-                <p className="text-base text-slate-700 leading-relaxed">
-                  <strong>YojanaSetu</strong> eliminates this bottleneck. By combining multimodal audio AI (Gemini Flash), ultra-fast semantic retrieval (Tiger Data pgvector), and natural regional voice generation (ElevenLabs), anyone who can speak can now unlock government support.
+                <p className="text-base text-[#404040] leading-relaxed font-medium">
+                  {t("about.p2")}
                 </p>
                 <div className="pt-2 flex flex-wrap gap-4">
-                  <div className="flex items-center gap-2 text-sm font-bold text-slate-800">
-                    <CheckCircle className="w-5 h-5 text-emerald-600" />
-                    <span>Zero Application Fees</span>
+                  <div className="flex items-center gap-2 text-sm font-semibold text-[#171717]">
+                    <CheckCircle2 className="w-5 h-5 text-[#00A3C4]" />
+                    <span>{t("about.benefit1")}</span>
                   </div>
-                  <div className="flex items-center gap-2 text-sm font-bold text-slate-800">
-                    <CheckCircle className="w-5 h-5 text-emerald-600" />
-                    <span>Verified Official Gazettes</span>
+                  <div className="flex items-center gap-2 text-sm font-semibold text-[#171717]">
+                    <CheckCircle2 className="w-5 h-5 text-[#00A3C4]" />
+                    <span>{t("about.benefit2")}</span>
                   </div>
-                  <div className="flex items-center gap-2 text-sm font-bold text-slate-800">
-                    <CheckCircle className="w-5 h-5 text-emerald-600" />
-                    <span>8+ Regional Dialects</span>
+                  <div className="flex items-center gap-2 text-sm font-semibold text-[#171717]">
+                    <CheckCircle2 className="w-5 h-5 text-[#00A3C4]" />
+                    <span>{t("about.benefit3")}</span>
                   </div>
                 </div>
               </div>
 
-              <div className="bg-[#0F172A] text-white p-8 rounded-xl border-2 border-slate-700 space-y-6">
-                <h3 className="text-xl font-black text-amber-400 border-b border-slate-700 pb-3">
-                  Two Unified Ways to Explore
+              {/* Structural Dark Anchor Card */}
+              <div className="bg-[#1A365D] text-white p-8 rounded-xl border border-[#23487A] space-y-6 shadow-md">
+                <h3 className="text-xl font-bold text-[#FF9F00] border-b border-[#23487A] pb-3">
+                  {t("about.cardTitle")}
                 </h3>
                 
                 <div className="flex items-start gap-4">
-                  <div className="p-3 bg-[#D97706] text-slate-950 rounded font-black shrink-0">
-                    <Mic className="w-6 h-6" />
+                  <div className="p-3 bg-[#FF9F00] text-[#171717] rounded-xl shrink-0 font-bold">
+                    <Mic className="w-5 h-5" />
                   </div>
                   <div>
-                    <h4 className="font-bold text-white text-base">Voice-First Experience</h4>
-                    <p className="text-xs text-slate-300 mt-1 leading-relaxed">
-                      Optimal for citizens who prefer speaking and listening over reading dense administrative text.
+                    <h4 className="font-bold text-white text-base">{t("about.voiceTitle")}</h4>
+                    <p className="text-xs text-slate-200 mt-1 leading-relaxed">
+                      {t("about.voiceDesc")}
                     </p>
                   </div>
                 </div>
 
                 <div className="flex items-start gap-4">
-                  <div className="p-3 bg-[#047857] text-white rounded font-black shrink-0">
-                    <Search className="w-6 h-6" />
+                  <div className="p-3 bg-[#00829D] text-white rounded-xl shrink-0 font-bold">
+                    <Search className="w-5 h-5" />
                   </div>
                   <div>
-                    <h4 className="font-bold text-white text-base">Structured MyScheme Search</h4>
-                    <p className="text-xs text-slate-300 mt-1 leading-relaxed">
-                      Ideal for CSC operators, social workers, and citizens seeking precise multi-criteria filter drilling.
+                    <h4 className="font-bold text-white text-base">{t("about.searchTitle")}</h4>
+                    <p className="text-xs text-slate-200 mt-1 leading-relaxed">
+                      {t("about.searchDesc")}
                     </p>
                   </div>
                 </div>
@@ -216,9 +248,9 @@ export default function HomePage() {
                 <div className="pt-2">
                   <Link
                     href="/search"
-                    className="block w-full text-center bg-white text-slate-950 hover:bg-slate-200 font-black py-3 rounded text-sm transition-colors"
+                    className="block w-full text-center bg-[#FF9F00] hover:bg-[#E68F00] text-[#171717] font-bold py-3 rounded-xl text-sm transition-all shadow-sm"
                   >
-                    Open Scheme Search Portal / योजना खोजें
+                    {t("about.openSearch")}
                   </Link>
                 </div>
               </div>
