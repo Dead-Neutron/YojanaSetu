@@ -230,7 +230,10 @@ export default function VoiceAssistant() {
         }
 
         if (data.audio_url) {
-          playAudioUrl(data.audio_url);
+          const fullAudioUrl = data.audio_url.startsWith("http") 
+            ? data.audio_url 
+            : `${apiUrl.replace(/\/api\/v1\/?$/, "")}${data.audio_url}`;
+          playAudioUrl(fullAudioUrl);
         } else {
           speakText(data.localized_response || data.response_text);
         }

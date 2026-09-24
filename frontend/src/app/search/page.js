@@ -75,6 +75,13 @@ export default function SearchPage() {
   const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
   const [selectedScheme, setSelectedScheme] = useState(null);
 
+  const [schemes, setSchemes] = useState(allSchemes);
+  const [totalCount, setTotalCount] = useState(allSchemes.length);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isLiveBackend, setIsLiveBackend] = useState(false);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+
   useEffect(() => {
     if (typeof window !== "undefined") {
       const params = new URLSearchParams(window.location.search);
@@ -85,58 +92,121 @@ export default function SearchPage() {
     }
   }, []);
 
-  const filteredSchemes = useMemo(() => {
-    return allSchemes.filter((scheme) => {
-      if (keyword.trim()) {
-        const query = keyword.toLowerCase();
-        const searchCorpus = (
-          (scheme.scheme_name || "") + " " +
-          (scheme.details || "") + " " +
-          (scheme.benefits || "") + " " +
-          (scheme.eligibility || "") + " " +
-          (scheme.category || "") + " " +
-          (scheme.state || "")
-        ).toLowerCase();
-        if (!searchCorpus.includes(query)) return false;
-      }
+  // Reset to page 1 whenever filters change
+  useEffect(() => {
+    setPage(1);
+  }, [keyword, selectedCategory, selectedState, selectedGender, selectedOccupation, selectedCaste, selectedLevel]);
 
-      if (selectedLevel !== "All" && scheme.level !== selectedLevel) {
-        return false;
-      }
+  // Fetch schemes from FastAPI backend with automatic local fallback
+  useEffect(() => {
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v1";
+    let isCancelled = false;
 
-      if (selectedCategory !== "All Categories" && scheme.category !== selectedCategory) {
-        return false;
-      }
-
-      if (selectedState !== "All States & UTs") {
-        if (selectedState === "Central / All India") {
-          if (scheme.level !== "Central" && scheme.state !== "All India") return false;
-        } else {
-          if (scheme.state !== selectedState && scheme.state !== "All India") return false;
+    const fetchLiveSchemes = async () => {
+      setIsLoading(true);
+      try {
+        const queryParams = new URLSearchParams();
+        if (keyword.trim()) queryParams.set("q", keyword.trim());
+        if (selectedCategory !== "All Categories") queryParams.set("category", selectedCategory);
+        if (selectedState !== "All States & UTs") {
+          if (selectedState !== "Central / All India") {
+            queryParams.set("state", selectedState);
+          }
         }
-      }
+        if (selectedGender !== "All Genders") queryParams.set("gender", selectedGender);
+        if (selectedOccupation !== "All Occupations") queryParams.set("occupation", selectedOccupation);
+        if (selectedCaste !== "All Castes") queryParams.set("caste", selectedCaste);
+        queryParams.set("page", page.toString());
+        queryParams.set("page_size", "20");
 
-      if (selectedGender !== "All Genders") {
-        if (scheme.gender && scheme.gender !== "All" && scheme.gender !== selectedGender) {
-          return false;
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 3500);
+
+        const res = await fetch(`${apiUrl}/schemes/search?${queryParams.toString()}`, {
+          signal: controller.signal
+        });
+        clearTimeout(timeoutId);
+
+        if (!isCancelled && res.ok) {
+          const data = await res.json();
+          let items = data.items || [];
+          
+          if (selectedLevel !== "All") {
+            items = items.filter(s => s.level === selectedLevel);
+          }
+
+          setSchemes(items);
+          setTotalCount(data.total || items.length);
+          setTotalPages(data.total_pages || 1);
+          setIsLiveBackend(true);
+          setIsLoading(false);
+          return;
         }
+      } catch (err) {
+        // Backend offline or unreachable - use client fallback
       }
 
-      if (selectedOccupation !== "All Occupations") {
-        if (scheme.occupation && scheme.occupation !== "All Citizens" && scheme.occupation !== selectedOccupation) {
-          return false;
-        }
-      }
+      if (!isCancelled) {
+        // Fallback to client-side filtering over extracted JSON dataset
+        const localFiltered = allSchemes.filter((scheme) => {
+          if (keyword.trim()) {
+            const query = keyword.toLowerCase();
+            const searchCorpus = (
+              (scheme.scheme_name || "") + " " +
+              (scheme.details || "") + " " +
+              (scheme.benefits || "") + " " +
+              (scheme.eligibility || "") + " " +
+              (scheme.category || "") + " " +
+              (scheme.state || "")
+            ).toLowerCase();
+            if (!searchCorpus.includes(query)) return false;
+          }
 
-      if (selectedCaste !== "All Castes") {
-        if (scheme.caste && scheme.caste !== "All" && scheme.caste !== selectedCaste) {
-          return false;
-        }
-      }
+          if (selectedLevel !== "All" && scheme.level !== selectedLevel) return false;
+          if (selectedCategory !== "All Categories" && scheme.category !== selectedCategory) return false;
 
-      return true;
-    });
-  }, [keyword, selectedLevel, selectedCategory, selectedState, selectedGender, selectedOccupation, selectedCaste]);
+          if (selectedState !== "All States & UTs") {
+            if (selectedState === "Central / All India") {
+              if (scheme.level !== "Central" && scheme.state !== "All India") return false;
+            } else {
+              if (scheme.state !== selectedState && scheme.state !== "All India") return false;
+            }
+          }
+
+          if (selectedGender !== "All Genders") {
+            if (scheme.gender && scheme.gender !== "All" && scheme.gender !== selectedGender) return false;
+          }
+
+          if (selectedOccupation !== "All Occupations") {
+            if (scheme.occupation && scheme.occupation !== "All Citizens" && scheme.occupation !== selectedOccupation) return false;
+          }
+
+          if (selectedCaste !== "All Castes") {
+            if (scheme.caste && scheme.caste !== "All" && scheme.caste !== selectedCaste) return false;
+          }
+
+          return true;
+        });
+
+        const pageSize = 20;
+        const start = (page - 1) * pageSize;
+        setSchemes(localFiltered.slice(start, start + pageSize));
+        setTotalCount(localFiltered.length);
+        setTotalPages(Math.max(1, Math.ceil(localFiltered.length / pageSize)));
+        setIsLiveBackend(false);
+        setIsLoading(false);
+      }
+    };
+
+    const debounceTimer = setTimeout(() => {
+      fetchLiveSchemes();
+    }, 200);
+
+    return () => {
+      isCancelled = true;
+      clearTimeout(debounceTimer);
+    };
+  }, [keyword, selectedLevel, selectedCategory, selectedState, selectedGender, selectedOccupation, selectedCaste, page]);
 
   const handleResetFilters = () => {
     setKeyword("");
@@ -187,7 +257,7 @@ export default function SearchPage() {
                   selectedLevel === "All" ? "bg-[#F59E0B] text-[#171717] shadow-sm" : "text-slate-200 hover:text-white"
                 }`}
               >
-                {t("search.allSchemes")} ({allSchemes.length})
+                {t("search.allSchemes")} ({isLiveBackend ? `${totalCount}` : allSchemes.length})
               </button>
               <button
                 type="button"
@@ -250,7 +320,7 @@ export default function SearchPage() {
             <span>{t("search.filters")} ({activeFiltersCount})</span>
           </button>
           <span className="text-sm font-semibold text-[#171717]">
-            {t("search.resultsCount", { count: filteredSchemes.length })}
+            {t("search.resultsCount", { count: totalCount })}
           </span>
         </div>
 
@@ -374,8 +444,20 @@ export default function SearchPage() {
           <section className="col-span-1 md:col-span-3 space-y-6">
             {/* Status & Active Filter Pills */}
             <div className="bg-[#F8F9FA] border border-[#E5E5E5] rounded-xl p-4 flex flex-wrap items-center justify-between gap-3 civic-shadow-sm">
-              <div className="text-sm font-medium text-[#171717]">
-                {t("search.resultsCount", { count: filteredSchemes.length })}
+              <div className="flex items-center gap-3">
+                <div className="text-sm font-medium text-[#171717]">
+                  {t("search.resultsCount", { count: totalCount })}
+                </div>
+                {isLiveBackend && (
+                  <span className="text-xs bg-[#ECFDF5] text-[#059669] border border-[#A7F3D0] px-2.5 py-0.5 rounded-full font-bold">
+                    Live Database (3,400 Schemes)
+                  </span>
+                )}
+                {isLoading && (
+                  <span className="text-xs text-slate-500 italic animate-pulse">
+                    Searching...
+                  </span>
+                )}
               </div>
 
               {activeFiltersCount > 0 && (
@@ -409,15 +491,42 @@ export default function SearchPage() {
             </div>
 
             {/* Scheme Cards Grid */}
-            {filteredSchemes.length > 0 ? (
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {filteredSchemes.map((scheme) => (
-                  <SchemeCard
-                    key={scheme.id}
-                    scheme={scheme}
-                    onSelect={(s) => setSelectedScheme(s)}
-                  />
-                ))}
+            {schemes.length > 0 ? (
+              <div className="space-y-6">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  {schemes.map((scheme) => (
+                    <SchemeCard
+                      key={scheme.id || scheme.slug}
+                      scheme={scheme}
+                      onSelect={(s) => setSelectedScheme(s)}
+                    />
+                  ))}
+                </div>
+
+                {/* Pagination Controls */}
+                {totalPages > 1 && (
+                  <div className="flex items-center justify-between bg-[#F8F9FA] border border-[#E5E5E5] rounded-xl p-4">
+                    <button
+                      type="button"
+                      disabled={page <= 1}
+                      onClick={() => setPage((p) => Math.max(1, p - 1))}
+                      className="px-4 py-2 text-xs font-bold rounded-lg border border-[#E5E5E5] bg-[#FFFFFF] text-[#171717] hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+                    >
+                      Previous
+                    </button>
+                    <div className="text-xs font-bold text-[#525252]">
+                      Page {page} of {totalPages}
+                    </div>
+                    <button
+                      type="button"
+                      disabled={page >= totalPages}
+                      onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                      className="px-4 py-2 text-xs font-bold rounded-lg border border-[#E5E5E5] bg-[#FFFFFF] text-[#171717] hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+                    >
+                      Next
+                    </button>
+                  </div>
+                )}
               </div>
             ) : (
               <div className="bg-[#F8F9FA] border border-[#E5E5E5] rounded-xl p-12 text-center space-y-4 civic-shadow-sm">
