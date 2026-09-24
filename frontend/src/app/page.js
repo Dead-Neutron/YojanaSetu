@@ -76,20 +76,24 @@ export default function HomePage() {
               transition={{ duration: 0.4, delay: 0.2 }}
               className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4"
             >
-              <a
-                href="#bento-hub"
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 bg-[#F59E0B] hover:bg-[#D97706] text-[#171717] font-bold px-7 py-3.5 rounded-xl text-base civic-shadow-md transition-all active:scale-95"
-              >
-                <Mic className="w-5 h-5 stroke-[2.2]" />
-                <span>Try Voice Assistant</span>
+              <a 
+                href="#bento-hub" 
+                     className="group w-full sm:w-auto inline-flex items-center justify-center gap-2.5 bg-[#F59E0B] hover:bg-[#D97706] text-[#171717] font-bold px-7 py-3.5 rounded-xl text-base civic-shadow-md transition-all active:scale-95" 
+              > 
+                <Mic className="w-5 h-5 stroke-[2.2]" /> 
+                <span className="inline-block transition-transform duration-200 group-hover:scale-105">
+                  Try Voice Assistant
+                </span>
               </a>
 
-              <Link
-                href="/search"
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 bg-[#122844] hover:bg-[#23487A] text-white font-bold px-7 py-3.5 rounded-xl text-base border border-[#23487A] transition-all shadow-sm"
-              >
-                <Search className="w-5 h-5 text-[#00A3C4]" />
-                <span>Browse Scheme Directory</span>
+              <Link 
+                href="/search" 
+                className="group w-full sm:w-auto inline-flex items-center justify-center gap-2.5 bg-[#122844] hover:bg-[#23487A] text-white font-bold px-7 py-3.5 rounded-xl text-base border border-[#23487A] transition-all shadow-sm" 
+              > 
+                <Search className="w-5 h-5 text-[#00A3C4]" /> 
+                <span className="inline-block transition-transform duration-200 group-hover:scale-105">
+                Browse Scheme Directory
+                </span>
               </Link>
             </motion.div>
 
@@ -246,11 +250,13 @@ export default function HomePage() {
                 </div>
 
                 <div className="pt-2">
-                  <Link
-                    href="/search"
-                    className="block w-full text-center bg-[#F59E0B] hover:bg-[#D97706] text-[#171717] font-bold py-3 rounded-xl text-sm transition-all shadow-sm"
-                  >
+                  <Link 
+                    href="/search" 
+                    className="group block w-full text-center bg-[#F59E0B] hover:bg-[#D97706] text-[#171717] font-bold py-3 rounded-xl text-sm transition-all shadow-sm" 
+                  > 
+                    <span className="inline-block transition-transform duration-200 group-hover:scale-105">
                     {t("about.openSearch")}
+                    </span>
                   </Link>
                 </div>
               </div>

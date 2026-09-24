@@ -96,30 +96,36 @@ export default function Navbar() {
                   key={lang.code}
                   type="button"
                   onClick={() => setLanguage(lang.code)}
-                  className={`px-2.5 sm:px-3 py-1 rounded-full text-xs font-bold transition-all ${
+                  className={`group px-2.5 sm:px-3 py-1 rounded-full text-xs font-bold transition-all ${
                     language === lang.code
                       ? "bg-[#F59E0B] text-[#171717] shadow-sm"
                       : "text-slate-200 hover:text-white"
                   }`}
                   aria-label={`Change language to ${lang.name}`}
                 >
-                  {lang.nativeName}
+                  <span className="inline-block transition-transform duration-200 group-hover:scale-105">
+                    {lang.nativeName}
+                  </span>
                 </button>
               ))}
             </div>
 
-            {/* Accessibility Dropdown Menu Trigger (Repositioned beside Language Selector) */}
+            {/* Accessibility Dropdown Menu Trigger */}
             <div className="relative" ref={accessibilityMenuRef}>
               <button
                 type="button"
                 onClick={() => setAccessibilityDropdownOpen(!accessibilityDropdownOpen)}
-                className="flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-[#1A365D] hover:bg-[#23487A] text-slate-200 hover:text-white border border-[#23487A] transition-all shadow-xs"
+                className="group flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-[#1A365D] hover:bg-[#23487A] text-slate-200 hover:text-white border border-[#23487A] transition-all shadow-xs"
                 aria-expanded={accessibilityDropdownOpen}
                 aria-label="Toggle accessibility options dropdown"
                 id="accessibility-dropdown-trigger"
               >
                 <Accessibility className="w-3.5 h-3.5 text-[#F59E0B]" />
-                <span className="hidden sm:inline">Accessibility</span>
+                <span className="hidden sm:inline">
+                  <span className="inline-block transition-transform duration-200 group-hover:scale-105">
+                    Accessibility
+                  </span>
+                </span>
                 <ChevronDown className={`w-3 h-3 text-slate-300 transition-transform ${accessibilityDropdownOpen ? "rotate-180" : ""}`} />
               </button>
 
@@ -173,13 +179,17 @@ export default function Navbar() {
                           key={tier.id}
                           type="button"
                           onClick={() => setFontSize(tier.id)}
-                          className={`p-2 rounded-lg border text-center transition-all ${
+                          className={`group p-2 rounded-lg border text-center transition-all ${
                             fontSize === tier.id
                               ? "bg-[#F59E0B] text-[#171717] font-bold border-[#FFD080] shadow-sm"
                               : "bg-[#122844] text-slate-200 border-[#23487A] hover:bg-[#23487A]"
                           }`}
                         >
-                          <div className="text-xs font-bold">{tier.label}</div>
+                          <div className="text-xs font-bold">
+                            <span className="inline-block transition-transform duration-200 group-hover:scale-105">
+                              {tier.label}
+                            </span>
+                          </div>
                           <div className="text-[9px] opacity-80">{tier.sub}</div>
                         </button>
                       ))}
@@ -203,13 +213,15 @@ export default function Navbar() {
                           key={sp.id}
                           type="button"
                           onClick={() => setLineHeight(sp.id)}
-                          className={`py-1.5 px-2 rounded-lg border text-xs font-semibold transition-all ${
+                          className={`group py-1.5 px-2 rounded-lg border text-xs font-semibold transition-all ${
                             lineHeight === sp.id
                               ? "bg-[#F59E0B] text-[#171717] font-bold border-[#FFD080]"
                               : "bg-[#122844] text-slate-200 border-[#23487A] hover:bg-[#23487A]"
                           }`}
                         >
-                          {sp.label}
+                          <span className="inline-block transition-transform duration-200 group-hover:scale-105">
+                            {sp.label}
+                          </span>
                         </button>
                       ))}
                     </div>
@@ -272,10 +284,12 @@ export default function Navbar() {
                     <button
                       type="button"
                       onClick={resetAccessibility}
-                      className="w-full bg-[#122844] hover:bg-[#23487A] text-slate-200 hover:text-white py-1.5 rounded-lg text-xs font-semibold border border-[#23487A] flex items-center justify-center gap-1.5 transition-colors"
+                      className="group w-full bg-[#122844] hover:bg-[#23487A] text-slate-200 hover:text-white py-1.5 rounded-lg text-xs font-semibold border border-[#23487A] flex items-center justify-center gap-1.5 transition-colors"
                     >
                       <RotateCcw className="w-3 h-3" />
-                      <span>Reset to System Defaults</span>
+                      <span className="inline-block transition-transform duration-200 group-hover:scale-105">
+                        Reset to System Defaults
+                      </span>
                     </button>
                   </div>
                 </div>
@@ -307,30 +321,36 @@ export default function Navbar() {
             <nav className="hidden md:flex items-center gap-2" aria-label="Main Navigation">
               <Link
                 href="/"
-                className={`px-4 py-2 rounded-xl font-bold text-sm transition-all ${
+                className={`group px-4 py-2 rounded-xl font-bold text-sm transition-all ${
                   pathname === "/"
                     ? "bg-[#F59E0B] text-[#171717] shadow-sm"
                     : "text-slate-200 hover:bg-[#23487A] hover:text-white"
                 }`}
               >
-                {t("nav.voiceAssistant")}
+                <span className="inline-block transition-transform duration-200 group-hover:scale-105">
+                  {t("nav.voiceAssistant")}
+                </span>
               </Link>
               <Link
                 href="/search"
-                className={`px-4 py-2 rounded-xl font-bold text-sm flex items-center gap-2 transition-all ${
+                className={`group px-4 py-2 rounded-xl font-bold text-sm flex items-center gap-2 transition-all ${
                   pathname === "/search"
                     ? "bg-[#F59E0B] text-[#171717] shadow-sm"
                     : "text-slate-200 hover:bg-[#23487A] hover:text-white"
                 }`}
               >
                 <Search className={`w-4 h-4 ${pathname === "/search" ? "text-[#171717]" : "text-[#00A3C4]"}`} />
-                <span>{t("nav.searchSchemes")}</span>
+                <span className="inline-block transition-transform duration-200 group-hover:scale-105">
+                  {t("nav.searchSchemes")}
+                </span>
               </Link>
               <a
                 href="#about"
-                className="px-4 py-2 rounded-xl font-semibold text-sm text-slate-200 hover:bg-[#23487A] hover:text-white transition-all"
+                className="group px-4 py-2 rounded-xl font-semibold text-sm text-slate-200 hover:bg-[#23487A] hover:text-white transition-all"
               >
-                {t("nav.about")}
+                <span className="inline-block transition-transform duration-200 group-hover:scale-105">
+                  {t("nav.about")}
+                </span>
               </a>
             </nav>
 
@@ -339,11 +359,13 @@ export default function Navbar() {
               <button
                 type="button"
                 onClick={() => setAuthModalOpen(true)}
-                className="flex items-center gap-2 bg-[#122844] hover:bg-[#23487A] text-white px-4 py-2 rounded-xl font-semibold text-xs border border-[#23487A] transition-all hover:border-[#00A3C4] shadow-sm"
+                className="group flex items-center gap-2 bg-[#122844] hover:bg-[#23487A] text-white px-4 py-2 rounded-xl font-semibold text-xs border border-[#23487A] transition-all hover:border-[#00A3C4] shadow-sm"
                 id="citizen-auth-button"
               >
                 <User className="w-4 h-4 text-[#F59E0B]" />
-                <span>{t("nav.citizenLogin")}</span>
+                <span className="inline-block transition-transform duration-200 group-hover:scale-105">
+                  {t("nav.citizenLogin")}
+                </span>
               </button>
             </div>
 
@@ -367,22 +389,26 @@ export default function Navbar() {
             <Link
               href="/"
               onClick={() => setMobileMenuOpen(false)}
-              className={`flex items-center gap-2 px-4 py-3 rounded-xl font-bold text-base ${
+              className={`group flex items-center gap-2 px-4 py-3 rounded-xl font-bold text-base ${
                 pathname === "/" ? "bg-[#F59E0B] text-[#171717]" : "text-white bg-[#1A365D]"
               }`}
             >
               <Mic className="w-5 h-5 text-[#F59E0B]" />
-              <span>{t("nav.voiceAssistant")}</span>
+              <span className="inline-block transition-transform duration-200 group-hover:scale-105">
+                {t("nav.voiceAssistant")}
+              </span>
             </Link>
             <Link
               href="/search"
               onClick={() => setMobileMenuOpen(false)}
-              className={`flex items-center gap-2 px-4 py-3 rounded-xl font-bold text-base ${
+              className={`group flex items-center gap-2 px-4 py-3 rounded-xl font-bold text-base ${
                 pathname === "/search" ? "bg-[#F59E0B] text-[#171717]" : "text-white bg-[#1A365D]"
               }`}
             >
               <Search className="w-5 h-5 text-[#00A3C4]" />
-              <span>{t("nav.searchSchemes")}</span>
+              <span className="inline-block transition-transform duration-200 group-hover:scale-105">
+                {t("nav.searchSchemes")}
+              </span>
             </Link>
             <button
               type="button"
@@ -390,10 +416,12 @@ export default function Navbar() {
                 setMobileMenuOpen(false);
                 setAuthModalOpen(true);
               }}
-              className="w-full text-left px-4 py-3 rounded-xl font-bold text-base text-white bg-[#1A365D] hover:bg-[#23487A] flex items-center gap-2"
+              className="group w-full text-left px-4 py-3 rounded-xl font-bold text-base text-white bg-[#1A365D] hover:bg-[#23487A] flex items-center gap-2"
             >
               <User className="w-4 h-4 text-[#F59E0B]" />
-              <span>{t("nav.citizenLogin")}</span>
+              <span className="inline-block transition-transform duration-200 group-hover:scale-105">
+                {t("nav.citizenLogin")}
+              </span>
             </button>
           </div>
         )}
@@ -443,9 +471,11 @@ export default function Navbar() {
                   alert("Auth0 Universal Login redirect activated. Connected to secure profile pre-filtering.");
                   setAuthModalOpen(false);
                 }}
-                className="w-full bg-[#F59E0B] hover:bg-[#D97706] text-[#171717] font-bold py-3 rounded-xl text-sm transition-all shadow-sm"
+                className="group w-full bg-[#F59E0B] hover:bg-[#D97706] text-[#171717] font-bold py-3 rounded-xl text-sm transition-all shadow-sm"
               >
-                {t("auth.proceed")}
+                <span className="inline-block transition-transform duration-200 group-hover:scale-105">
+                  {t("auth.proceed")}
+                </span>
               </button>
             </div>
           </div>
