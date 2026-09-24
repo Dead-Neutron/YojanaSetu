@@ -4,7 +4,6 @@ venv/
 .agents/
 
 # Local Sensitive / Large Data
-dataset/
 PLAN.md
 
 # Environment Credentials & Secrets
@@ -29,6 +28,9 @@ __pycache__/
 *.py[cod]
 *$py.class
 *.so
+*.db
+*.sqlite
+*.sqlite3
 .pytest_cache/
 .coverage
 htmlcov/

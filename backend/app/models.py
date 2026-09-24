@@ -1,0 +1,57 @@
+from datetime import datetime
+from sqlalchemy import Column, Integer, String, Text, DateTime
+from app.database import Base
+
+
+class Scheme(Base):
+    """
+    SQLAlchemy representation of Indian Government Schemes.
+    Supports hybrid queries: relational filtering (state, category, gender, occupation, age)
+    combined with semantic vector search.
+    """
+    __tablename__ = "schemes"
+
+    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
+    scheme_name = Column(String(512), index=True, nullable=False)
+    slug = Column(String(512), unique=True, index=True, nullable=True)
+    details = Column(Text, nullable=True)
+    benefits = Column(Text, nullable=True)
+    eligibility = Column(Text, nullable=True)
+    application = Column(Text, nullable=True)
+    documents = Column(Text, nullable=True)
+    level = Column(String(50), default="Central")
+    state = Column(String(100), index=True, nullable=True)
+    scheme_category = Column(String(100), index=True, nullable=True)
+    tags = Column(Text, nullable=True)
+    target_age_min = Column(Integer, nullable=True)
+    target_age_max = Column(Integer, nullable=True)
+    gender = Column(String(50), nullable=True)
+    occupation = Column(String(100), nullable=True)
+    income_bracket = Column(String(100), nullable=True)
+    caste_category = Column(String(100), nullable=True)
+    embedding = Column(Text, nullable=True)  # JSON-serialized 768-dim vector or pgvector format
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "scheme_name": self.scheme_name,
+            "slug": self.slug,
+            "details": self.details,
+            "benefits": self.benefits,
+            "eligibility": self.eligibility,
+            "application": self.application,
+            "documents": self.documents,
+            "level": self.level,
+            "state": self.state,
+            "scheme_category": self.scheme_category,
+            "category": self.scheme_category,
+            "tags": [t.strip() for t in self.tags.split(",") if t.strip()] if self.tags else [],
+            "target_age_min": self.target_age_min,
+            "target_age_max": self.target_age_max,
+            "gender": self.gender,
+            "occupation": self.occupation,
+            "income_bracket": self.income_bracket,
+            "caste_category": self.caste_category,
+            "caste": self.caste_category,
+        }
