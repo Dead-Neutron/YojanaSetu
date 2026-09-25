@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { X, User, LogOut, CheckCircle2, Save, Sliders, Shield } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { X, User, LogOut, CheckCircle2, Save, Sliders, Shield, Sparkles, ArrowRight } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 
 const INDIAN_STATES = [
@@ -19,6 +20,7 @@ const GENDERS = ["Female", "Male", "Transgender", "All"];
 const CASTES = ["General", "OBC", "SC", "ST", "EWS"];
 
 export default function CitizenProfileModal({ isOpen, onClose }) {
+  const router = useRouter();
   const { user, logout, updateDemographics } = useAuth();
 
   // Initialize with user's saved demographics, or empty string for first-time citizens
@@ -205,6 +207,29 @@ export default function CitizenProfileModal({ isOpen, onClose }) {
               </select>
             </div>
           </div>
+
+          {/* Quick Recommendations Navigation Callout */}
+          {(state || user?.demographics?.state) && (
+            <div className="bg-[#0B1E36] border border-[#00A3C4]/30 rounded-xl p-3 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Sparkles className="w-4 h-4 text-[#F59E0B]" />
+                <span className="text-xs font-semibold text-slate-200">
+                  Ready to see your eligible welfare schemes?
+                </span>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  onClose();
+                  router.push("/recommendations");
+                }}
+                className="text-xs text-[#F59E0B] hover:text-white font-bold flex items-center gap-1 cursor-pointer transition-colors"
+              >
+                <span>View Schemes</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          )}
 
           {/* Action Buttons */}
           <div className="pt-2 flex items-center justify-between gap-3">

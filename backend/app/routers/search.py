@@ -1,12 +1,80 @@
 from typing import Optional, List, Dict, Any
-from fastapi import APIRouter, Depends, Query, HTTPException
+from fastapi import APIRouter, Depends, Query, HTTPException, Request
 from sqlalchemy.orm import Session
+from app.core.config import settings
+from app.core.security import get_current_user_optional
 from app.database import get_db
-from app.models import Scheme
-from app.services.rag import search_schemes, load_local_schemes
-from app.schemas import SchemeSearchResponse, SchemeOut
+from app.models import Scheme, CitizenProfile
+from app.services.rag import search_schemes, load_local_schemes, get_personalized_recommendations
+from app.schemas import SchemeSearchResponse, SchemeOut, SchemeRecommendationsResponse, DemographicInfo
 
 router = APIRouter(prefix="/schemes", tags=["Schemes"])
+
+
+@router.get("/recommendations", response_model=SchemeRecommendationsResponse)
+async def get_citizen_scheme_recommendations(
+    request: Request,
+    category: Optional[str] = Query(None, description="Optional filter by Scheme Category"),
+    citizen: dict = Depends(get_current_user_optional),
+    db: Session = Depends(get_db)
+):
+    """
+    Personalized welfare schemes recommendation engine for authenticated citizens.
+    Only accessible if citizen is authenticated AND has saved their demographic profile.
+    """
+    sub = citizen.get("sub", "anonymous-citizen")
+    header_sub = request.headers.get("x-citizen-sub")
+    if (sub in ["anonymous-citizen", "guest-user"]) and header_sub:
+        sub = header_sub
+
+    is_auth = (not citizen.get("is_anonymous", False) and sub != "anonymous-citizen") or bool(header_sub)
+    if not is_auth:
+        raise HTTPException(
+            status_code=401,
+            detail="Authentication required. Please sign in with your Citizen ID to view personalized scheme recommendations."
+        )
+
+    # 1. Fetch saved citizen demographic criteria from Database
+    demographics_dict = None
+    if db is not None:
+        try:
+            profile = db.query(CitizenProfile).filter(CitizenProfile.sub == sub).first()
+            if profile:
+                demographics_dict = profile.to_demographics_dict()
+        except Exception:
+            pass
+
+    # 2. Check fallback in-memory cache if DB had no profile
+    if not demographics_dict:
+        from app.routers.auth import _user_demographics_db
+        cached_demographics = _user_demographics_db.get(sub)
+        if cached_demographics:
+            demographics_dict = cached_demographics.model_dump()
+
+    # 3. Check custom claims namespace
+    if not demographics_dict:
+        custom_key = f"{settings.AUTH0_AUDIENCE}/demographics"
+        if custom_key in citizen and isinstance(citizen[custom_key], dict):
+            demographics_dict = citizen[custom_key]
+
+    if not demographics_dict or (not demographics_dict.get("state") and not demographics_dict.get("occupation")):
+        raise HTTPException(
+            status_code=400,
+            detail="Demographic profile incomplete. Please complete your State and Occupation in the Demographic Form to unlock personalized recommendations."
+        )
+
+    recommendations = get_personalized_recommendations(
+        db=db,
+        demographics=demographics_dict,
+        category_filter=category
+    )
+
+    return SchemeRecommendationsResponse(
+        citizen_demographics=DemographicInfo(**demographics_dict),
+        total_recommended=recommendations["total_recommended"],
+        items=recommendations["items"],
+        categories=recommendations["categories"]
+    )
 
 
 @router.get("/search", response_model=SchemeSearchResponse)

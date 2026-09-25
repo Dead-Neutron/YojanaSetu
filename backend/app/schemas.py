@@ -48,6 +48,18 @@ class SchemeSearchResponse(BaseModel):
     total_pages: int
 
 
+class RecommendedSchemeOut(SchemeOut):
+    match_score: int = Field(default=85, description="Personalized match percentage (0-100%)")
+    match_reasons: List[str] = Field(default_factory=list, description="Reasons explaining citizen eligibility")
+
+
+class SchemeRecommendationsResponse(BaseModel):
+    citizen_demographics: DemographicInfo
+    total_recommended: int
+    items: List[RecommendedSchemeOut]
+    categories: List[str] = Field(default_factory=list)
+
+
 class VoiceQueryResponse(BaseModel):
     transcript: str
     detected_language: str
