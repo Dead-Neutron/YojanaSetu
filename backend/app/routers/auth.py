@@ -1,14 +1,17 @@
 import logging
 from typing import Dict, Any, Optional
 from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy.orm import Session
 from app.core.config import settings
 from app.core.security import get_current_user_optional
+from app.database import get_db
+from app.models import CitizenProfile
 from app.schemas import AuthConfigResponse, UserProfile, DemographicInfo
 
 logger = logging.getLogger("yojanasetu.auth")
 router = APIRouter(prefix="/auth", tags=["Authentication & Citizen Identity"])
 
-# In-memory user demographic profiles cache (persists during process lifetime)
+# In-memory user demographic profiles cache as fallback
 _user_demographics_db: Dict[str, DemographicInfo] = {}
 
 
@@ -30,29 +33,43 @@ def get_auth_configuration():
 
 @router.get("/me", response_model=UserProfile)
 async def get_current_citizen_profile(
-    citizen: dict = Depends(get_current_user_optional)
+    citizen: dict = Depends(get_current_user_optional),
+    db: Session = Depends(get_db)
 ):
     """
     Returns citizen identity state.
     Designed for universal access: unauthenticated citizens return is_authenticated=False without error.
-    Authenticated citizens receive their decoded Auth0 claims and demographic criteria.
+    Authenticated citizens receive their decoded Auth0 claims and demographic criteria loaded from DB.
     """
     sub = citizen.get("sub", "anonymous-citizen")
     is_auth = not citizen.get("is_anonymous", False) and sub != "anonymous-citizen"
 
-    saved_demographics = _user_demographics_db.get(sub)
+    saved_demographics = None
 
-    # Extract name and email from claims
-    name = citizen.get("name") or citizen.get("nickname") or ("Registered Citizen" if is_auth else "Anonymous Citizen")
-    email = citizen.get("email")
-    picture = citizen.get("picture")
+    # 1. First, check persistent Database for authenticated citizen
+    if is_auth and db is not None:
+        try:
+            profile_record = db.query(CitizenProfile).filter(CitizenProfile.sub == sub).first()
+            if profile_record:
+                saved_demographics = DemographicInfo(**profile_record.to_demographics_dict())
+        except Exception as e:
+            logger.warning(f"Error loading citizen profile from DB: {e}")
 
-    # If demographics were passed in Auth0 custom claims namespace, parse them
+    # 2. In-memory cache fallback
+    if not saved_demographics and sub in _user_demographics_db:
+        saved_demographics = _user_demographics_db.get(sub)
+
+    # 3. If demographics were passed in Auth0 custom claims namespace, parse them
     custom_claims_key = f"{settings.AUTH0_AUDIENCE}/demographics"
     if not saved_demographics and custom_claims_key in citizen:
         d = citizen[custom_claims_key]
         if isinstance(d, dict):
             saved_demographics = DemographicInfo(**d)
+
+    # Extract name and email from claims
+    name = citizen.get("name") or citizen.get("nickname") or ("Registered Citizen" if is_auth else "Anonymous Citizen")
+    email = citizen.get("email")
+    picture = citizen.get("picture")
 
     return UserProfile(
         sub=sub,
@@ -67,14 +84,35 @@ async def get_current_citizen_profile(
 @router.post("/profile", response_model=UserProfile)
 async def update_citizen_profile(
     demographics: DemographicInfo,
-    citizen: dict = Depends(get_current_user_optional)
+    citizen: dict = Depends(get_current_user_optional),
+    db: Session = Depends(get_db)
 ):
     """
     Updates or saves citizen demographic preferences (e.g. State, Occupation, Gender, Caste, Age).
-    Works for both authenticated citizens (stored under Auth0 sub) and guest citizens.
+    Persists to the relational database tied to the citizen's Auth0 unique user ID (sub).
     """
     sub = citizen.get("sub", "anonymous-citizen")
     is_auth = not citizen.get("is_anonymous", False) and sub != "anonymous-citizen"
+
+    # Persist to database if authenticated and database is active
+    if is_auth and db is not None:
+        try:
+            profile_record = db.query(CitizenProfile).filter(CitizenProfile.sub == sub).first()
+            if not profile_record:
+                profile_record = CitizenProfile(sub=sub)
+                db.add(profile_record)
+
+            profile_record.state = demographics.state
+            profile_record.occupation = demographics.occupation
+            profile_record.gender = demographics.gender
+            profile_record.caste = demographics.caste
+            profile_record.age = demographics.age
+            db.commit()
+            db.refresh(profile_record)
+            logger.info(f"Persisted demographic profile to DB for citizen {sub}")
+        except Exception as e:
+            logger.error(f"Error persisting citizen profile to DB: {e}")
+            db.rollback()
 
     _user_demographics_db[sub] = demographics
 

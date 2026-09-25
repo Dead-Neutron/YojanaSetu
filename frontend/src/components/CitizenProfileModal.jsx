@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { X, User, LogOut, CheckCircle2, Save, Sliders, Shield } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 
@@ -21,23 +21,33 @@ const CASTES = ["General", "OBC", "SC", "ST", "EWS"];
 export default function CitizenProfileModal({ isOpen, onClose }) {
   const { user, logout, updateDemographics } = useAuth();
 
-  const [state, setState] = useState(user?.demographics?.state || "Bihar");
-  const [occupation, setOccupation] = useState(user?.demographics?.occupation || "Farmer");
-  const [gender, setGender] = useState(user?.demographics?.gender || "All");
-  const [caste, setCaste] = useState(user?.demographics?.caste || "OBC");
-  const [age, setAge] = useState(user?.demographics?.age || 35);
+  // Initialize with user's saved demographics, or empty string for first-time citizens
+  const [state, setState] = useState(user?.demographics?.state || "");
+  const [occupation, setOccupation] = useState(user?.demographics?.occupation || "");
+  const [gender, setGender] = useState(user?.demographics?.gender || "");
+  const [caste, setCaste] = useState(user?.demographics?.caste || "");
+  const [age, setAge] = useState(user?.demographics?.age ?? "");
   const [isSaved, setIsSaved] = useState(false);
+
+  // Sync state whenever user demographics load or change from DB
+  useEffect(() => {
+    setState(user?.demographics?.state || "");
+    setOccupation(user?.demographics?.occupation || "");
+    setGender(user?.demographics?.gender || "");
+    setCaste(user?.demographics?.caste || "");
+    setAge(user?.demographics?.age ?? "");
+  }, [user?.demographics]);
 
   if (!isOpen || !user) return null;
 
-  const handleSave = (e) => {
+  const handleSave = async (e) => {
     e.preventDefault();
-    updateDemographics({
-      state,
-      occupation,
-      gender,
-      caste,
-      age: parseInt(age, 10) || 0,
+    await updateDemographics({
+      state: state || null,
+      occupation: occupation || null,
+      gender: gender || null,
+      caste: caste || null,
+      age: age ? parseInt(age, 10) : null,
     });
     setIsSaved(true);
     setTimeout(() => {
@@ -78,7 +88,7 @@ export default function CitizenProfileModal({ isOpen, onClose }) {
           <button
             type="button"
             onClick={onClose}
-            className="text-slate-300 hover:text-white p-2 rounded-xl hover:bg-[#23487A] transition-colors"
+            className="text-slate-300 hover:text-white p-2 rounded-xl hover:bg-[#23487A] transition-colors cursor-pointer"
             aria-label="Close modal"
           >
             <X className="w-5 h-5" />
@@ -90,7 +100,7 @@ export default function CitizenProfileModal({ isOpen, onClose }) {
           <div className="bg-[#0B1E36] border border-[#23487A] rounded-xl p-3.5 flex items-start gap-2.5">
             <Sliders className="w-4 h-4 text-[#00A3C4] shrink-0 mt-0.5" />
             <p className="text-xs text-slate-300 leading-relaxed">
-              Your demographic profile pre-filters welfare schemes in the search portal and automatically tunes the voice assistant for personalized eligibility matching.
+              Your demographic profile is securely saved in the database. It pre-filters welfare schemes in the search portal and tunes the voice assistant for personalized eligibility matching.
             </p>
           </div>
 
@@ -106,6 +116,7 @@ export default function CitizenProfileModal({ isOpen, onClose }) {
                 onChange={(e) => setState(e.target.value)}
                 className="w-full p-2.5 bg-[#122844] border border-[#23487A] rounded-xl text-sm font-semibold text-white focus:border-[#00A3C4] focus:outline-none"
               >
+                <option value="">-- Select State of Residence --</option>
                 {INDIAN_STATES.map((st) => (
                   <option key={st} value={st}>
                     {st}
@@ -125,6 +136,7 @@ export default function CitizenProfileModal({ isOpen, onClose }) {
                 onChange={(e) => setOccupation(e.target.value)}
                 className="w-full p-2.5 bg-[#122844] border border-[#23487A] rounded-xl text-sm font-semibold text-white focus:border-[#00A3C4] focus:outline-none"
               >
+                <option value="">-- Select Primary Occupation --</option>
                 {OCCUPATIONS.map((occ) => (
                   <option key={occ} value={occ}>
                     {occ}
@@ -145,6 +157,7 @@ export default function CitizenProfileModal({ isOpen, onClose }) {
                   onChange={(e) => setGender(e.target.value)}
                   className="w-full p-2.5 bg-[#122844] border border-[#23487A] rounded-xl text-sm font-semibold text-white focus:border-[#00A3C4] focus:outline-none"
                 >
+                  <option value="">-- Select Gender --</option>
                   {GENDERS.map((g) => (
                     <option key={g} value={g}>
                       {g}
@@ -162,9 +175,10 @@ export default function CitizenProfileModal({ isOpen, onClose }) {
                   type="number"
                   min="1"
                   max="120"
+                  placeholder="e.g. 35"
                   value={age}
                   onChange={(e) => setAge(e.target.value)}
-                  className="w-full p-2.5 bg-[#122844] border border-[#23487A] rounded-xl text-sm font-semibold text-white focus:border-[#00A3C4] focus:outline-none"
+                  className="w-full p-2.5 bg-[#122844] border border-[#23487A] rounded-xl text-sm font-semibold text-white focus:border-[#00A3C4] focus:outline-none placeholder-slate-500"
                 />
               </div>
             </div>
@@ -180,6 +194,7 @@ export default function CitizenProfileModal({ isOpen, onClose }) {
                 onChange={(e) => setCaste(e.target.value)}
                 className="w-full p-2.5 bg-[#122844] border border-[#23487A] rounded-xl text-sm font-semibold text-white focus:border-[#00A3C4] focus:outline-none"
               >
+                <option value="">-- Select Category / Caste --</option>
                 {CASTES.map((c) => (
                   <option key={c} value={c}>
                     {c}
@@ -197,7 +212,7 @@ export default function CitizenProfileModal({ isOpen, onClose }) {
                 logout();
                 onClose();
               }}
-              className="px-4 py-2.5 rounded-xl border border-red-500/40 text-red-300 hover:text-white hover:bg-red-950/40 text-xs font-bold flex items-center gap-1.5 transition-colors"
+              className="px-4 py-2.5 rounded-xl border border-red-500/40 text-red-300 hover:text-white hover:bg-red-950/40 text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer"
             >
               <LogOut className="w-3.5 h-3.5" />
               <span>Sign Out to Guest</span>
@@ -205,12 +220,12 @@ export default function CitizenProfileModal({ isOpen, onClose }) {
 
             <button
               type="submit"
-              className="bg-[#F59E0B] hover:bg-[#D97706] text-[#171717] px-5 py-2.5 rounded-xl text-xs font-black flex items-center gap-2 transition-all shadow-sm active:scale-95"
+              className="bg-[#F59E0B] hover:bg-[#D97706] text-[#171717] px-5 py-2.5 rounded-xl text-xs font-black flex items-center gap-2 transition-all shadow-sm active:scale-95 cursor-pointer"
             >
               {isSaved ? (
                 <>
                   <CheckCircle2 className="w-4 h-4 text-[#171717]" />
-                  <span>Preferences Saved!</span>
+                  <span>Preferences Saved to Database!</span>
                 </>
               ) : (
                 <>

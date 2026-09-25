@@ -85,6 +85,9 @@ export function AuthProvider({ children }) {
           // Clean hash from browser URL without page reload
           window.history.replaceState(null, "", window.location.pathname + window.location.search);
           setIsLoading(false);
+
+          // Fetch persisted demographics from database for this citizen
+          loadSavedProfile(accessToken || idToken, parsedUser);
           return;
         }
       } catch (err) {
@@ -99,8 +102,12 @@ export function AuthProvider({ children }) {
         const storedToken = localStorage.getItem("yojanasetu_auth_token");
 
         if (storedUser) {
-          setUser(JSON.parse(storedUser));
+          const parsed = JSON.parse(storedUser);
+          setUser(parsed);
           setToken(storedToken);
+          if (storedToken) {
+            loadSavedProfile(storedToken, parsed);
+          }
         }
       } catch (err) {
         console.warn("Could not load stored user session:", err);
@@ -109,6 +116,30 @@ export function AuthProvider({ children }) {
 
     setIsLoading(false);
   }, [apiUrl]);
+
+  // Helper to load citizen profile criteria from backend database
+  const loadSavedProfile = async (authToken, baseUser) => {
+    try {
+      const res = await fetch(`${apiUrl}/auth/me`, {
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+        },
+      });
+      if (res.ok) {
+        const profileData = await res.json();
+        const updatedUser = {
+          ...baseUser,
+          demographics: profileData?.demographics || null,
+        };
+        setUser(updatedUser);
+        if (typeof window !== "undefined") {
+          localStorage.setItem("yojanasetu_auth_user", JSON.stringify(updatedUser));
+        }
+      }
+    } catch (err) {
+      console.warn("Could not load citizen profile from server:", err);
+    }
+  };
 
   // 2. Auth0 Universal Login Redirect Trigger
   const loginWithAuth0 = () => {
@@ -150,29 +181,43 @@ export function AuthProvider({ children }) {
   };
 
   // 4. Update Citizen Demographics
-  const updateDemographics = (newDemographics) => {
+  const updateDemographics = async (newDemographics) => {
     if (!user) return;
     const updatedUser = {
       ...user,
-      demographics: {
-        ...(user.demographics || {}),
-        ...newDemographics,
-      },
+      demographics: newDemographics,
     };
     setUser(updatedUser);
     if (typeof window !== "undefined") {
       localStorage.setItem("yojanasetu_auth_user", JSON.stringify(updatedUser));
     }
 
-    // Sync to backend
-    fetch(`${apiUrl}/auth/profile`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      },
-      body: JSON.stringify(newDemographics),
-    }).catch(() => {});
+    // Sync to backend database
+    try {
+      const res = await fetch(`${apiUrl}/auth/profile`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify(newDemographics),
+      });
+      if (res.ok) {
+        const savedProfile = await res.json();
+        if (savedProfile && savedProfile.demographics) {
+          const syncedUser = {
+            ...updatedUser,
+            demographics: savedProfile.demographics,
+          };
+          setUser(syncedUser);
+          if (typeof window !== "undefined") {
+            localStorage.setItem("yojanasetu_auth_user", JSON.stringify(syncedUser));
+          }
+        }
+      }
+    } catch (err) {
+      console.warn("Could not sync demographics to backend DB:", err);
+    }
   };
 
   return (

@@ -378,8 +378,9 @@ export default function Navbar() {
                       {user?.name}
                     </div>
                     <div className="text-[10px] text-[#00A3C4] font-medium leading-none mt-0.5">
-                      {user?.demographics?.occupation || "Citizen"}
-                      {user?.demographics?.state ? ` • ${user.demographics.state}` : ""}
+                      {user?.demographics?.occupation
+                        ? `${user.demographics.occupation}${user.demographics.state ? ` • ${user.demographics.state}` : ""}`
+                        : (user?.demographics?.state || "Set Demographics")}
                     </div>
                   </div>
                 </button>
@@ -455,8 +456,9 @@ export default function Navbar() {
                   <div>
                     <div className="text-sm font-bold text-white">{user?.name}</div>
                     <div className="text-xs text-[#00A3C4] font-medium">
-                      {user?.demographics?.occupation || "Citizen"}
-                      {user?.demographics?.state ? ` • ${user.demographics.state}` : ""}
+                      {user?.demographics?.occupation
+                        ? `${user.demographics.occupation}${user.demographics.state ? ` • ${user.demographics.state}` : ""}`
+                        : (user?.demographics?.state || "Set Demographics")}
                     </div>
                   </div>
                 </div>
