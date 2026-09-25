@@ -52,10 +52,12 @@ export default function BentoDashboard() {
 
         <Link
           href="/search"
-          className="inline-flex items-center gap-2 bg-[#F59E0B] hover:bg-[#D97706] text-[#171717] px-5 py-2.5 rounded-xl font-bold text-sm shadow-sm transition-all hover:shadow"
+          className="group inline-flex items-center gap-2 bg-[#F59E0B] hover:bg-[#D97706] text-[#171717] px-5 py-2.5 rounded-xl font-bold text-sm shadow-sm transition-all hover:shadow"
         >
           <Search className="w-4 h-4 text-[#171717]" />
-          <span>{t("nav.searchSchemes")}</span>
+          <span className="inline-block transition-transform duration-200 group-hover:scale-105">
+            {t("nav.searchSchemes")}
+          </span>
         </Link>
       </div>
 
@@ -127,8 +129,13 @@ export default function BentoDashboard() {
               <h3 className="text-base font-bold text-[#171717] tracking-tight">
                 {t("categories.title")}
               </h3>
-              <Link href="/search" className="text-xs font-bold text-[#00A3C4] hover:underline flex items-center gap-1">
-                <span>All</span>
+              <Link 
+                href="/search" 
+                className="group text-xs font-bold text-[#00A3C4] hover:underline flex items-center gap-1"
+              >
+                <span className="inline-block transition-transform duration-200 group-hover:scale-105">
+                  All
+                </span>
                 <ArrowRight className="w-3.5 h-3.5" />
               </Link>
             </div>
@@ -145,7 +152,9 @@ export default function BentoDashboard() {
                     <IconComponent className="w-5 h-5 text-[#1A365D] group-hover:text-[#00A3C4] transition-colors mb-2" />
                     <div>
                       <div className="text-xs font-bold text-[#171717] leading-tight">
-                        {t(`categories.${item.key}`)}
+                        <span className="inline-block transition-transform duration-200 group-hover:scale-105">
+                          {t(`categories.${item.key}`)}
+                        </span>
                       </div>
                       <div className="text-[10px] font-semibold text-[#525252] mt-0.5">
                         {item.tag}
@@ -182,14 +191,16 @@ export default function BentoDashboard() {
                   key={stepNum}
                   type="button"
                   onClick={() => setActiveWizardStep(stepNum)}
-                  className={`px-3 py-1.5 rounded-md text-xs font-bold transition-all ${
+                  className={`group px-3 py-1.5 rounded-md text-xs font-bold transition-all ${
                     activeWizardStep === stepNum
                       ? "bg-[#1A365D] text-white shadow-xs"
                       : "text-[#404040] hover:text-[#171717]"
                   }`}
                   aria-label={`View step ${stepNum}`}
                 >
-                  Step {stepNum}
+                  <span className="inline-block transition-transform duration-200 group-hover:scale-105">
+                    Step {stepNum}
+                  </span>
                 </button>
               ))}
             </div>
