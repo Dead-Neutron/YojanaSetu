@@ -60,6 +60,11 @@ class VoiceQueryResponse(BaseModel):
     schemes: List[SchemeOut] = Field(default_factory=list)
 
 
+class SynthesizeSpeechRequest(BaseModel):
+    text: str
+    language: str = "bn"
+
+
 class HealthResponse(BaseModel):
     status: str
     version: str

@@ -12,7 +12,8 @@ import {
   Loader2, 
   ArrowRight,
   Play,
-  Pause
+  Pause,
+  Languages
 } from "lucide-react";
 import SchemeCard from "./SchemeCard";
 import SchemeModal from "./SchemeModal";
@@ -109,6 +110,8 @@ export default function VoiceAssistant() {
   const [state, setState] = useState("idle");
 
   const [transcript, setTranscript] = useState("");
+  const [englishTranslation, setEnglishTranslation] = useState("");
+  const [detectedLanguage, setDetectedLanguage] = useState("");
   const [spokenResponseText, setSpokenResponseText] = useState("");
   const [matchedSchemes, setMatchedSchemes] = useState([]);
   const [selectedScheme, setSelectedScheme] = useState(null);
@@ -121,6 +124,10 @@ export default function VoiceAssistant() {
   const animationFrameRef = useRef(null);
   const audioPlayerRef = useRef(null);
   const synthRef = useRef(null);
+  const currentAudioUrlRef = useRef(null);
+  const recognitionRef = useRef(null);
+  const liveTranscriptRef = useRef("");
+  const detectedLangRef = useRef(null);
 
   const sampleQueries = SAMPLE_QUERIES_BY_LANG[language] || SAMPLE_QUERIES_BY_LANG.en;
 
@@ -141,23 +148,64 @@ export default function VoiceAssistant() {
     };
   }, []);
 
-  // MediaRecorder Audio Start
+  // MediaRecorder Audio Start with automatic browser SpeechRecognition & script detection
   const handleStartListening = async () => {
     setErrorMessage(null);
     setTranscript("");
+    setEnglishTranslation("");
+    setDetectedLanguage("");
     setSpokenResponseText("");
     setMatchedSchemes([]);
+    liveTranscriptRef.current = "";
+    detectedLangRef.current = null;
     if (synthRef.current) synthRef.current.cancel();
 
     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
       setErrorMessage(
         language === "hi"
-          ? "आपके ब्राउज़र में ऑडियो रिकॉर्डिंग समर्थित नहीं है। कृपया नीचे दिए गए विषयों में से चुनें।"
+          ? "आपके ब्राउज़र में ऑडियो रिकॉर्डिंग समर्थিত नहीं है। कृपया नीचे दिए गए विषयों में से चुनें।"
           : language === "bn"
           ? "আপনার ব্রাউজার অডিও রেকর্ডিং সমর্থন করে না। অনুগ্রহ করে নিচের বিষয়গুলো নির্বাচন করুন।"
           : "Your browser does not support audio recording. Please choose a topic below."
       );
       return;
+    }
+
+    // Initialize browser speech recognition for instant native script detection
+    const SpeechRecognition = typeof window !== "undefined" && (window.SpeechRecognition || window.webkitSpeechRecognition);
+    if (SpeechRecognition) {
+      try {
+        const recognition = new SpeechRecognition();
+        recognition.continuous = true;
+        recognition.interimResults = true;
+        // Align recognition.lang with citizen preference: hi-IN, bn-IN, or en-IN
+        recognition.lang = language === "hi" ? "hi-IN" : (language === "bn" ? "bn-IN" : "en-IN");
+
+        recognition.onresult = (event) => {
+          let currentTranscript = "";
+          for (let i = 0; i < event.results.length; i++) {
+            currentTranscript += event.results[i][0].transcript + " ";
+          }
+          const trimmed = currentTranscript.trim();
+          liveTranscriptRef.current = trimmed;
+
+          // Auto-detect Indic script in real-time
+          if (/[\u0980-\u09FF]/.test(trimmed)) {
+            detectedLangRef.current = "bn";
+          } else if (/[\u0900-\u097F]/.test(trimmed)) {
+            detectedLangRef.current = "hi";
+          }
+        };
+
+        recognition.onerror = (e) => {
+          console.debug("Live SpeechRecognition note:", e.error);
+        };
+
+        recognition.start();
+        recognitionRef.current = recognition;
+      } catch (err) {
+        console.debug("Live speech recognition initialization:", err);
+      }
     }
 
     try {
@@ -173,8 +221,13 @@ export default function VoiceAssistant() {
       recorder.onstop = async () => {
         stopAudioCapture();
         stream.getTracks().forEach((track) => track.stop());
+        if (recognitionRef.current) {
+          try {
+            recognitionRef.current.stop();
+          } catch (e) {}
+        }
         const audioBlob = new Blob(audioChunksRef.current, { type: "audio/webm" });
-        await processAudioQuery(audioBlob);
+        await processAudioQuery(audioBlob, liveTranscriptRef.current, detectedLangRef.current);
       };
 
       recorder.start();
@@ -197,24 +250,38 @@ export default function VoiceAssistant() {
   };
 
   const handleStopListening = () => {
+    if (recognitionRef.current) {
+      try {
+        recognitionRef.current.stop();
+      } catch (e) {}
+    }
     if (mediaRecorderRef.current && mediaRecorderRef.current.state === "recording") {
       mediaRecorderRef.current.stop();
       setState("processing");
     }
   };
 
-  const processAudioQuery = async (audioBlob) => {
+  const processAudioQuery = async (audioBlob, clientTranscript, clientLang) => {
     setState("processing");
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v1";
     let processed = false;
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v1";
+    const effectiveLang = clientLang || (
+      clientTranscript && /[\u0980-\u09FF]/.test(clientTranscript) ? "bn" :
+      clientTranscript && /[\u0900-\u097F]/.test(clientTranscript) ? "hi" :
+      (language || "auto")
+    );
 
     try {
       const formData = new FormData();
       formData.append("audio", audioBlob, "voice.webm");
-      formData.append("language", language);
+      formData.append("language", effectiveLang);
+      if (clientTranscript && clientTranscript.trim().length > 0) {
+        formData.append("client_transcript", clientTranscript.trim());
+      }
 
+      // 25-second timeout to allow full Sarvam STT + pgvector RAG + Gemini + Bulbul TTS pipeline
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 6000);
+      const timeoutId = setTimeout(() => controller.abort(), 25000);
 
       const headers = {};
       if (token) {
@@ -229,10 +296,11 @@ export default function VoiceAssistant() {
       });
       clearTimeout(timeoutId);
 
-
       if (res.ok) {
         const data = await res.json();
-        setTranscript(data.transcript || "");
+        setTranscript(data.transcript || clientTranscript || "");
+        setEnglishTranslation(data.english_translation || "");
+        setDetectedLanguage(data.detected_language || effectiveLang || "");
         setSpokenResponseText(data.localized_response || data.response_text);
         if (data.schemes && data.schemes.length > 0) {
           setMatchedSchemes(data.schemes);
@@ -246,16 +314,17 @@ export default function VoiceAssistant() {
             : `${apiUrl.replace(/\/api\/v1\/?$/, "")}${data.audio_url}`;
           playAudioUrl(fullAudioUrl);
         } else {
-          speakText(data.localized_response || data.response_text);
+          playVernacularSpeech(data.localized_response || data.response_text, data.detected_language || effectiveLang);
         }
         processed = true;
       }
     } catch (err) {
-      console.warn("Backend not reachable, executing client fallback:", err);
+      console.warn("Backend not reachable or timeout, executing client fallback:", err);
     }
 
     if (!processed) {
-      executeClientVoiceSimulation(sampleQueries[0]);
+      const fallbackList = SAMPLE_QUERIES_BY_LANG[effectiveLang] || SAMPLE_QUERIES_BY_LANG.bn || SAMPLE_QUERIES_BY_LANG.en;
+      executeClientVoiceSimulation(fallbackList[0]);
     }
   };
 
@@ -271,6 +340,8 @@ export default function VoiceAssistant() {
 
   const executeClientVoiceSimulation = (item) => {
     setTranscript(item.query);
+    setEnglishTranslation(item.query);
+    setDetectedLanguage(language);
     setSpokenResponseText(item.spokenResponse);
 
     const matched = allSchemes.filter((s) => {
@@ -280,7 +351,27 @@ export default function VoiceAssistant() {
     }).slice(0, 4);
 
     setMatchedSchemes(matched.length > 0 ? matched : allSchemes.slice(0, 3));
-    speakText(item.spokenResponse);
+    playVernacularSpeech(item.spokenResponse, language);
+  };
+
+  const playVernacularSpeech = async (text, lang) => {
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v1";
+    try {
+      const res = await fetch(`${apiUrl}/voice-query/synthesize-text`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text, language: lang })
+      });
+      if (res.ok) {
+        const blob = await res.blob();
+        const blobUrl = URL.createObjectURL(blob);
+        playAudioUrl(blobUrl);
+        return;
+      }
+    } catch (e) {
+      console.warn("Server speech synthesis unavailable, falling back to browser speech:", e);
+    }
+    speakText(text);
   };
 
   const speakText = (text) => {
@@ -317,6 +408,7 @@ export default function VoiceAssistant() {
   };
 
   const playAudioUrl = (url) => {
+    currentAudioUrlRef.current = url;
     setState("speaking");
     setIsPlaying(true);
     if (audioPlayerRef.current) {
@@ -330,7 +422,16 @@ export default function VoiceAssistant() {
   };
 
   const handleReplay = () => {
-    if (spokenResponseText) speakText(spokenResponseText);
+    if (currentAudioUrlRef.current && audioPlayerRef.current) {
+      setState("speaking");
+      setIsPlaying(true);
+      audioPlayerRef.current.currentTime = 0;
+      audioPlayerRef.current.play().catch(() => {
+        if (spokenResponseText) playVernacularSpeech(spokenResponseText, language);
+      });
+    } else if (spokenResponseText) {
+      playVernacularSpeech(spokenResponseText, language);
+    }
   };
 
   const handleStopAudio = () => {
@@ -493,7 +594,7 @@ export default function VoiceAssistant() {
       </div>
 
       {/* Synchronized Read-Along Spoken Answer Box */}
-      {(transcript || spokenResponseText) && (
+      {spokenResponseText && (
         <div className="bg-[#F8F9FA] border border-[#E5E5E5] rounded-xl p-6 sm:p-8 mt-8 civic-shadow-md">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-[#E5E5E5] gap-3">
             <div className="flex items-center gap-2.5">
@@ -505,7 +606,7 @@ export default function VoiceAssistant() {
             <button
               type="button"
               onClick={handleReplay}
-              className="group inline-flex items-center gap-1.5 bg-[#F59E0B] hover:bg-[#D97706] text-[#171717] px-3 py-1.5 rounded-xl font-bold text-xs self-start sm:self-auto transition-all"
+              className="group inline-flex items-center gap-1.5 bg-[#F59E0B] hover:bg-[#D97706] text-[#171717] px-3.5 py-1.5 rounded-xl font-bold text-xs self-start sm:self-auto transition-all civic-shadow-sm"
             >
               <RotateCcw className="w-3.5 h-3.5" />
               <span className="inline-block transition-transform duration-200 group-hover:scale-105">
@@ -514,28 +615,47 @@ export default function VoiceAssistant() {
             </button>
           </div>
 
-          {transcript && (
+          {/* Sarvam AI Audio-to-English Translated Query Section */}
+          {englishTranslation && (
             <div className="py-4 border-b border-[#E5E5E5]">
-              <div className="text-xs font-bold text-[#525252] uppercase tracking-wide mb-1">
-                {t("hero.yourQuestion")}
+              <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
+                <div className="text-xs font-bold text-[#00829D] uppercase tracking-wider flex items-center gap-1.5">
+                  <Languages className="w-3.5 h-3.5 text-[#00A3C4]" />
+                  <span>
+                    {detectedLanguage === "en" || (!detectedLanguage && language === "en")
+                      ? "Citizen Voice Query (English)"
+                      : language === "bn"
+                      ? "অনূদিত অনুসন্ধান (সার্ভাম এআই ইংরেজি অনুবাদ)"
+                      : language === "hi"
+                      ? "अनुवादित खोज (सर्वम एआई अंग्रेजी अनुवाद)"
+                      : "Translated Voice Query (Sarvam English Translation)"}
+                  </span>
+                </div>
+                {detectedLanguage && (
+                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-[#E6F7FA] text-[#00829D] border border-[#00A3C4]/30">
+                    {detectedLanguage === "bn"
+                      ? "সনাক্তকৃত ভাষা: বাংলা (Bengali)"
+                      : detectedLanguage === "hi"
+                      ? "पहचानी गई भाषा: हिन्दी (Hindi)"
+                      : "Language: English (EN)"}
+                  </span>
+                )}
               </div>
-              <div className="text-base font-semibold text-[#171717] italic bg-[#FFFFFF] p-3 rounded-xl border border-[#E5E5E5]">
-                "{transcript}"
+              <div className="text-base font-semibold text-slate-800 italic bg-white p-3.5 rounded-xl border border-slate-200 shadow-sm">
+                "{englishTranslation}"
               </div>
             </div>
           )}
 
-          {spokenResponseText && (
-            <div className="pt-4">
-              <div className="text-xs font-bold text-[#00829D] uppercase tracking-wide mb-2 flex items-center gap-1.5">
-                <Volume2 className="w-4 h-4 text-[#00A3C4]" />
-                <span>{t("hero.assistantAnswer")}</span>
-              </div>
-              <div className="text-lg sm:text-xl font-bold text-[#171717] leading-relaxed bg-[#E6F7FA] p-5 rounded-xl border border-[#00A3C4]/30">
-                {spokenResponseText}
-              </div>
+          <div className="pt-4">
+            <div className="text-xs font-bold text-[#00829D] uppercase tracking-wide mb-2.5 flex items-center gap-1.5">
+              <Volume2 className="w-4 h-4 text-[#00A3C4]" />
+              <span>{t("hero.assistantAnswer")}</span>
             </div>
-          )}
+            <div className="text-lg sm:text-xl font-medium text-[#171717] leading-relaxed bg-[#E6F7FA] p-6 rounded-xl border border-[#00A3C4]/30 shadow-inner">
+              {spokenResponseText}
+            </div>
+          </div>
         </div>
       )}
 
