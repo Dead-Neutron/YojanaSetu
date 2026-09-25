@@ -1,6 +1,6 @@
 import logging
 from typing import Generator
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, text
 from sqlalchemy.orm import declarative_base, sessionmaker, Session
 from app.core.config import settings
 
@@ -65,8 +65,20 @@ def get_db() -> Generator[Session, None, None]:
 def init_db():
     """Create tables if they do not exist."""
     try:
+        # Import models so they are registered with SQLAlchemy metadata
+        import app.models  # noqa: F401
         if engine is not None:
+            # Auto-enable pgvector extension on PostgreSQL
+            if "postgresql" in str(engine.url):
+                try:
+                    with engine.connect() as conn:
+                        conn.execute(text("CREATE EXTENSION IF NOT EXISTS vector;"))
+                        conn.commit()
+                        logger.info("PostgreSQL pgvector extension verified/enabled.")
+                except Exception as e:
+                    logger.info(f"Notice enabling pgvector extension (optional): {e}")
             Base.metadata.create_all(bind=engine)
             logger.info("Database schema verified/created successfully.")
     except Exception as e:
         logger.warning(f"Database schema auto-creation encountered notice: {e}")
+

@@ -2,6 +2,7 @@ from typing import Optional, List, Dict, Any
 from fastapi import APIRouter, Depends, Query, HTTPException
 from sqlalchemy.orm import Session
 from app.database import get_db
+from app.models import Scheme
 from app.services.rag import search_schemes, load_local_schemes
 from app.schemas import SchemeSearchResponse, SchemeOut
 
@@ -45,18 +46,44 @@ def get_schemes_search(
 @router.get("/categories", response_model=List[str])
 def get_categories(db: Session = Depends(get_db)):
     """Returns list of all unique welfare scheme categories."""
-    schemes = load_local_schemes()
+    raw_cats = []
+    if db is not None:
+        try:
+            results = db.query(Scheme.scheme_category).distinct().all()
+            raw_cats = [r[0] for r in results if r[0]]
+        except Exception:
+            pass
+
+    if not raw_cats:
+        schemes = load_local_schemes()
+        for s in schemes:
+            cat = s.get("category") or s.get("scheme_category")
+            if cat:
+                raw_cats.append(cat)
+
     categories = set()
-    for s in schemes:
-        cat = s.get("category") or s.get("scheme_category")
-        if cat:
-            categories.add(cat)
+    for entry in raw_cats:
+        for part in entry.split(","):
+            cleaned = part.strip()
+            if cleaned and len(cleaned) > 2:
+                categories.add(cleaned)
+
     return sorted(list(categories))
+
 
 
 @router.get("/states", response_model=List[str])
 def get_states(db: Session = Depends(get_db)):
     """Returns list of all supported Indian states."""
+    if db is not None:
+        try:
+            results = db.query(Scheme.state).distinct().all()
+            states = sorted([r[0] for r in results if r[0] and r[0] != "All"])
+            if states:
+                return states
+        except Exception:
+            pass
+
     schemes = load_local_schemes()
     states = set()
     for s in schemes:
@@ -69,8 +96,17 @@ def get_states(db: Session = Depends(get_db)):
 @router.get("/{scheme_id}", response_model=SchemeOut)
 def get_scheme_by_id(scheme_id: int, db: Session = Depends(get_db)):
     """Retrieve detailed scheme information by its unique ID."""
+    if db is not None:
+        try:
+            scheme = db.query(Scheme).filter(Scheme.id == scheme_id).first()
+            if scheme:
+                return scheme.to_dict()
+        except Exception:
+            pass
+
     schemes = load_local_schemes()
     for s in schemes:
         if s.get("id") == scheme_id:
             return s
     raise HTTPException(status_code=404, detail="Scheme not found")
+

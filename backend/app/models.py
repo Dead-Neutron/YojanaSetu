@@ -19,16 +19,16 @@ class Scheme(Base):
     eligibility = Column(Text, nullable=True)
     application = Column(Text, nullable=True)
     documents = Column(Text, nullable=True)
-    level = Column(String(50), default="Central")
-    state = Column(String(100), index=True, nullable=True)
-    scheme_category = Column(String(100), index=True, nullable=True)
+    level = Column(String(100), default="Central")
+    state = Column(String(255), index=True, nullable=True)
+    scheme_category = Column(Text, nullable=True)
     tags = Column(Text, nullable=True)
     target_age_min = Column(Integer, nullable=True)
     target_age_max = Column(Integer, nullable=True)
-    gender = Column(String(50), nullable=True)
-    occupation = Column(String(100), nullable=True)
-    income_bracket = Column(String(100), nullable=True)
-    caste_category = Column(String(100), nullable=True)
+    gender = Column(String(100), nullable=True)
+    occupation = Column(String(255), nullable=True)
+    income_bracket = Column(String(255), nullable=True)
+    caste_category = Column(String(255), nullable=True)
     embedding = Column(Text, nullable=True)  # JSON-serialized 768-dim vector or pgvector format
     created_at = Column(DateTime, default=datetime.utcnow)
 
@@ -55,3 +55,29 @@ class Scheme(Base):
             "caste_category": self.caste_category,
             "caste": self.caste_category,
         }
+
+
+class CitizenProfile(Base):
+    """
+    SQLAlchemy representation of Citizen Demographic Profile.
+    Persists citizen demographic criteria tied to their Auth0 `sub` user identifier.
+    """
+    __tablename__ = "citizen_profiles"
+
+    sub = Column(String(255), primary_key=True, index=True)
+    state = Column(String(100), nullable=True)
+    occupation = Column(String(100), nullable=True)
+    gender = Column(String(50), nullable=True)
+    caste = Column(String(50), nullable=True)
+    age = Column(Integer, nullable=True)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    def to_demographics_dict(self):
+        return {
+            "state": self.state,
+            "occupation": self.occupation,
+            "gender": self.gender,
+            "caste": self.caste,
+            "age": self.age,
+        }
+

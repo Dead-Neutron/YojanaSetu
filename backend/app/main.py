@@ -7,7 +7,7 @@ from slowapi.errors import RateLimitExceeded
 from app.core.config import settings
 from app.core.limiter import limiter, rate_limit_exceeded_handler
 from app.database import init_db
-from app.routers import health, search, voice
+from app.routers import health, search, voice, auth
 
 # Configure application logging
 logging.basicConfig(
@@ -52,6 +52,8 @@ app.add_middleware(
 app.include_router(health.router, prefix=settings.API_V1_STR)
 app.include_router(search.router, prefix=settings.API_V1_STR)
 app.include_router(voice.router, prefix=settings.API_V1_STR)
+app.include_router(auth.router, prefix=settings.API_V1_STR)
+
 
 
 @app.get("/", tags=["Root"])

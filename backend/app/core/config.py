@@ -47,7 +47,7 @@ class Settings(BaseSettings):
         return [origin.strip() for origin in self.CORS_ORIGINS.split(",") if origin.strip()]
 
     model_config = SettingsConfigDict(
-        env_file=(".env", "../.env", "../../.env"),
+        env_file=(".env", "backend/.env", "../.env", "../../.env"),
         env_file_encoding="utf-8",
         extra="ignore"
     )

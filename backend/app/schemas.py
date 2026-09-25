@@ -64,3 +64,20 @@ class HealthResponse(BaseModel):
     status: str
     version: str
     services: Dict[str, Any]
+
+
+class AuthConfigResponse(BaseModel):
+    domain: str
+    client_id: str
+    audience: Optional[str] = None
+    is_configured: bool
+
+
+class UserProfile(BaseModel):
+    sub: str
+    is_authenticated: bool
+    name: Optional[str] = "Anonymous Citizen"
+    email: Optional[str] = None
+    picture: Optional[str] = None
+    demographics: Optional[DemographicInfo] = None
+

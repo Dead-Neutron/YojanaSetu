@@ -7,12 +7,15 @@ import SchemeCard from "@/components/SchemeCard";
 import SchemeModal from "@/components/SchemeModal";
 import allSchemes from "@/data/schemes.json";
 import { useLanguage } from "@/i18n/LanguageContext";
+import { useAuth } from "@/context/AuthContext";
 import { 
   Search, 
   Filter, 
   X, 
   SlidersHorizontal, 
-  RotateCcw
+  RotateCcw,
+  Sparkles,
+  UserCheck
 } from "lucide-react";
 
 const CATEGORIES = [
@@ -65,6 +68,7 @@ const CASTES = ["All Castes", "General", "OBC", "SC", "ST", "EWS"];
 
 export default function SearchPage() {
   const { t } = useLanguage();
+  const { user, token, isAuthenticated } = useAuth();
   const [keyword, setKeyword] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All Categories");
   const [selectedState, setSelectedState] = useState("All States & UTs");
@@ -81,21 +85,48 @@ export default function SearchPage() {
   const [isLiveBackend, setIsLiveBackend] = useState(false);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [categoriesList, setCategoriesList] = useState(CATEGORIES);
+  const [statesList, setStatesList] = useState(STATES);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
       const params = new URLSearchParams(window.location.search);
       const cat = params.get("category");
-      if (cat && CATEGORIES.includes(cat)) {
+      if (cat) {
         setSelectedCategory(cat);
       }
     }
+  }, []);
+
+  // Fetch dynamic categories and states from FastAPI backend if available
+  useEffect(() => {
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v1";
+    fetch(`${apiUrl}/schemes/categories`)
+      .then((res) => (res.ok ? res.json() : null))
+      .then((cats) => {
+        if (cats && Array.isArray(cats) && cats.length > 0) {
+          const uniqueCats = Array.from(new Set(["All Categories", ...cats]));
+          setCategoriesList(uniqueCats);
+        }
+      })
+      .catch(() => {});
+
+    fetch(`${apiUrl}/schemes/states`)
+      .then((res) => (res.ok ? res.json() : null))
+      .then((sts) => {
+        if (sts && Array.isArray(sts) && sts.length > 0) {
+          const uniqueStates = Array.from(new Set(["All States & UTs", "Central / All India", ...sts]));
+          setStatesList(uniqueStates);
+        }
+      })
+      .catch(() => {});
   }, []);
 
   // Reset to page 1 whenever filters change
   useEffect(() => {
     setPage(1);
   }, [keyword, selectedCategory, selectedState, selectedGender, selectedOccupation, selectedCaste, selectedLevel]);
+
 
   // Fetch schemes from FastAPI backend with automatic local fallback
   useEffect(() => {
@@ -122,8 +153,14 @@ export default function SearchPage() {
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 3500);
 
+        const headers = {};
+        if (token) {
+          headers["Authorization"] = `Bearer ${token}`;
+        }
+
         const res = await fetch(`${apiUrl}/schemes/search?${queryParams.toString()}`, {
-          signal: controller.signal
+          signal: controller.signal,
+          headers
         });
         clearTimeout(timeoutId);
 
@@ -216,6 +253,15 @@ export default function SearchPage() {
     setSelectedOccupation("All Occupations");
     setSelectedCaste("All Castes");
     setSelectedLevel("All");
+  };
+
+  const handleApplyProfileFilters = () => {
+    if (!user?.demographics) return;
+    const { state, occupation, gender, caste } = user.demographics;
+    if (state && statesList.includes(state)) setSelectedState(state);
+    if (occupation && OCCUPATIONS.includes(occupation)) setSelectedOccupation(occupation);
+    if (gender && GENDERS.includes(gender)) setSelectedGender(gender);
+    if (caste && CASTES.includes(caste)) setSelectedCaste(caste);
   };
 
   const activeFiltersCount = [
@@ -344,6 +390,27 @@ export default function SearchPage() {
               )}
             </div>
 
+            {/* Optional Citizen Profile Auto-Filter Helper */}
+            {isAuthenticated && user?.demographics && (
+              <div className="bg-[#1A365D]/5 border border-[#1A365D]/20 rounded-xl p-3 text-xs space-y-2">
+                <div className="flex items-center gap-1.5 font-bold text-[#1A365D]">
+                  <Sparkles className="w-3.5 h-3.5 text-[#F59E0B]" />
+                  <span>Citizen Profile Match</span>
+                </div>
+                <p className="text-slate-600 text-[11px] leading-tight">
+                  {user.name || "Citizen"}: {user.demographics.occupation || "General"} ({user.demographics.state || "All India"})
+                </p>
+                <button
+                  type="button"
+                  onClick={handleApplyProfileFilters}
+                  className="w-full py-1.5 px-2 bg-[#1A365D] hover:bg-[#23487A] text-white rounded-lg font-bold text-[11px] transition-colors flex items-center justify-center gap-1"
+                >
+                  <UserCheck className="w-3 h-3 text-[#F59E0B]" />
+                  <span>Apply Profile Filters</span>
+                </button>
+              </div>
+            )}
+
             {/* State Filter */}
             <div className="space-y-1.5">
               <label htmlFor="filter-state" className="text-xs font-bold text-[#525252] uppercase tracking-wide block">
@@ -355,8 +422,8 @@ export default function SearchPage() {
                 onChange={(e) => setSelectedState(e.target.value)}
                 className="w-full p-2.5 bg-[#FFFFFF] border border-[#E5E5E5] rounded-xl text-sm font-medium text-[#171717] focus:border-[#00A3C4] focus:outline-none"
               >
-                {STATES.map((state) => (
-                  <option key={state} value={state}>
+                {statesList.map((state, idx) => (
+                  <option key={`desktop-state-${idx}-${state}`} value={state}>
                     {state}
                   </option>
                 ))}
@@ -374,8 +441,8 @@ export default function SearchPage() {
                 onChange={(e) => setSelectedCategory(e.target.value)}
                 className="w-full p-2.5 bg-[#FFFFFF] border border-[#E5E5E5] rounded-xl text-sm font-medium text-[#171717] focus:border-[#00A3C4] focus:outline-none"
               >
-                {CATEGORIES.map((cat) => (
-                  <option key={cat} value={cat}>
+                {categoriesList.map((cat, idx) => (
+                  <option key={`desktop-cat-${idx}-${cat}`} value={cat}>
                     {cat}
                   </option>
                 ))}
@@ -568,6 +635,26 @@ export default function SearchPage() {
             </div>
 
             <div className="space-y-4 text-sm font-semibold">
+              {isAuthenticated && user?.demographics && (
+                <div className="bg-[#1A365D]/5 border border-[#1A365D]/20 rounded-xl p-3 text-xs space-y-2">
+                  <div className="flex items-center gap-1.5 font-bold text-[#1A365D]">
+                    <Sparkles className="w-3.5 h-3.5 text-[#F59E0B]" />
+                    <span>Citizen Profile Match</span>
+                  </div>
+                  <p className="text-slate-600 text-[11px] leading-tight">
+                    {user.name || "Citizen"}: {user.demographics.occupation || "General"} ({user.demographics.state || "All India"})
+                  </p>
+                  <button
+                    type="button"
+                    onClick={handleApplyProfileFilters}
+                    className="w-full py-1.5 px-2 bg-[#1A365D] hover:bg-[#23487A] text-white rounded-lg font-bold text-[11px] transition-colors flex items-center justify-center gap-1"
+                  >
+                    <UserCheck className="w-3 h-3 text-[#F59E0B]" />
+                    <span>Apply Profile Filters</span>
+                  </button>
+                </div>
+              )}
+
               <div>
                 <label className="block text-xs font-bold text-[#525252] uppercase mb-1">{t("search.stateLabel")}</label>
                 <select
@@ -575,7 +662,7 @@ export default function SearchPage() {
                   onChange={(e) => setSelectedState(e.target.value)}
                   className="w-full p-2.5 border border-[#E5E5E5] rounded-xl bg-[#FFFFFF] text-sm font-medium text-[#171717]"
                 >
-                  {STATES.map((s) => (<option key={s} value={s}>{s}</option>))}
+                  {statesList.map((s, idx) => (<option key={`mobile-state-${idx}-${s}`} value={s}>{s}</option>))}
                 </select>
               </div>
 
@@ -586,7 +673,7 @@ export default function SearchPage() {
                   onChange={(e) => setSelectedCategory(e.target.value)}
                   className="w-full p-2.5 border border-[#E5E5E5] rounded-xl bg-[#FFFFFF] text-sm font-medium text-[#171717]"
                 >
-                  {CATEGORIES.map((c) => (<option key={c} value={c}>{c}</option>))}
+                  {categoriesList.map((c, idx) => (<option key={`mobile-cat-${idx}-${c}`} value={c}>{c}</option>))}
                 </select>
               </div>
 
@@ -630,7 +717,7 @@ export default function SearchPage() {
                 onClick={() => setMobileFilterOpen(false)}
                 className="w-full bg-[#F59E0B] hover:bg-[#D97706] text-[#171717] py-3 rounded-xl font-bold text-sm shadow-sm"
               >
-                {t("search.applyFilters", { count: filteredSchemes.length })}
+                {t("search.applyFilters", { count: totalCount })}
               </button>
               <button
                 type="button"

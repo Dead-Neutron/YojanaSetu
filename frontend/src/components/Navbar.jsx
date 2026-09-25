@@ -5,6 +5,9 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { useAccessibility } from "@/context/AccessibilityContext";
+import { useAuth } from "@/context/AuthContext";
+import CitizenLoginModal from "./CitizenLoginModal";
+import CitizenProfileModal from "./CitizenProfileModal";
 import { 
   Search, 
   Menu, 
@@ -25,6 +28,7 @@ import {
 export default function Navbar() {
   const pathname = usePathname();
   const { language, setLanguage, t, supportedLanguages } = useLanguage();
+  const { user, isAuthenticated } = useAuth();
   const {
     fontSize,
     setFontSize,
@@ -38,9 +42,11 @@ export default function Navbar() {
   } = useAccessibility();
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [authModalOpen, setAuthModalOpen] = useState(false);
+  const [loginModalOpen, setLoginModalOpen] = useState(false);
+  const [profileModalOpen, setProfileModalOpen] = useState(false);
   const [accessibilityDropdownOpen, setAccessibilityDropdownOpen] = useState(false);
   const accessibilityMenuRef = useRef(null);
+
 
   // Close accessibility dropdown on outside click or Escape
   useEffect(() => {
@@ -96,30 +102,36 @@ export default function Navbar() {
                   key={lang.code}
                   type="button"
                   onClick={() => setLanguage(lang.code)}
-                  className={`px-2.5 sm:px-3 py-1 rounded-full text-xs font-bold transition-all ${
+                  className={`group px-2.5 sm:px-3 py-1 rounded-full text-xs font-bold transition-all ${
                     language === lang.code
                       ? "bg-[#F59E0B] text-[#171717] shadow-sm"
                       : "text-slate-200 hover:text-white"
                   }`}
                   aria-label={`Change language to ${lang.name}`}
                 >
-                  {lang.nativeName}
+                  <span className="inline-block transition-transform duration-200 group-hover:scale-105">
+                    {lang.nativeName}
+                  </span>
                 </button>
               ))}
             </div>
 
-            {/* Accessibility Dropdown Menu Trigger (Repositioned beside Language Selector) */}
+            {/* Accessibility Dropdown Menu Trigger */}
             <div className="relative" ref={accessibilityMenuRef}>
               <button
                 type="button"
                 onClick={() => setAccessibilityDropdownOpen(!accessibilityDropdownOpen)}
-                className="flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-[#1A365D] hover:bg-[#23487A] text-slate-200 hover:text-white border border-[#23487A] transition-all shadow-xs"
+                className="group flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-[#1A365D] hover:bg-[#23487A] text-slate-200 hover:text-white border border-[#23487A] transition-all shadow-xs"
                 aria-expanded={accessibilityDropdownOpen}
                 aria-label="Toggle accessibility options dropdown"
                 id="accessibility-dropdown-trigger"
               >
                 <Accessibility className="w-3.5 h-3.5 text-[#F59E0B]" />
-                <span className="hidden sm:inline">Accessibility</span>
+                <span className="hidden sm:inline">
+                  <span className="inline-block transition-transform duration-200 group-hover:scale-105">
+                    Accessibility
+                  </span>
+                </span>
                 <ChevronDown className={`w-3 h-3 text-slate-300 transition-transform ${accessibilityDropdownOpen ? "rotate-180" : ""}`} />
               </button>
 
@@ -173,13 +185,17 @@ export default function Navbar() {
                           key={tier.id}
                           type="button"
                           onClick={() => setFontSize(tier.id)}
-                          className={`p-2 rounded-lg border text-center transition-all ${
+                          className={`group p-2 rounded-lg border text-center transition-all ${
                             fontSize === tier.id
                               ? "bg-[#F59E0B] text-[#171717] font-bold border-[#FFD080] shadow-sm"
                               : "bg-[#122844] text-slate-200 border-[#23487A] hover:bg-[#23487A]"
                           }`}
                         >
-                          <div className="text-xs font-bold">{tier.label}</div>
+                          <div className="text-xs font-bold">
+                            <span className="inline-block transition-transform duration-200 group-hover:scale-105">
+                              {tier.label}
+                            </span>
+                          </div>
                           <div className="text-[9px] opacity-80">{tier.sub}</div>
                         </button>
                       ))}
@@ -203,13 +219,15 @@ export default function Navbar() {
                           key={sp.id}
                           type="button"
                           onClick={() => setLineHeight(sp.id)}
-                          className={`py-1.5 px-2 rounded-lg border text-xs font-semibold transition-all ${
+                          className={`group py-1.5 px-2 rounded-lg border text-xs font-semibold transition-all ${
                             lineHeight === sp.id
                               ? "bg-[#F59E0B] text-[#171717] font-bold border-[#FFD080]"
                               : "bg-[#122844] text-slate-200 border-[#23487A] hover:bg-[#23487A]"
                           }`}
                         >
-                          {sp.label}
+                          <span className="inline-block transition-transform duration-200 group-hover:scale-105">
+                            {sp.label}
+                          </span>
                         </button>
                       ))}
                     </div>
@@ -272,10 +290,12 @@ export default function Navbar() {
                     <button
                       type="button"
                       onClick={resetAccessibility}
-                      className="w-full bg-[#122844] hover:bg-[#23487A] text-slate-200 hover:text-white py-1.5 rounded-lg text-xs font-semibold border border-[#23487A] flex items-center justify-center gap-1.5 transition-colors"
+                      className="group w-full bg-[#122844] hover:bg-[#23487A] text-slate-200 hover:text-white py-1.5 rounded-lg text-xs font-semibold border border-[#23487A] flex items-center justify-center gap-1.5 transition-colors"
                     >
                       <RotateCcw className="w-3 h-3" />
-                      <span>Reset to System Defaults</span>
+                      <span className="inline-block transition-transform duration-200 group-hover:scale-105">
+                        Reset to System Defaults
+                      </span>
                     </button>
                   </div>
                 </div>
@@ -307,44 +327,76 @@ export default function Navbar() {
             <nav className="hidden md:flex items-center gap-2" aria-label="Main Navigation">
               <Link
                 href="/"
-                className={`px-4 py-2 rounded-xl font-bold text-sm transition-all ${
+                className={`group px-4 py-2 rounded-xl font-bold text-sm transition-all ${
                   pathname === "/"
                     ? "bg-[#F59E0B] text-[#171717] shadow-sm"
                     : "text-slate-200 hover:bg-[#23487A] hover:text-white"
                 }`}
               >
-                {t("nav.voiceAssistant")}
+                <span className="inline-block transition-transform duration-200 group-hover:scale-105">
+                  {t("nav.voiceAssistant")}
+                </span>
               </Link>
               <Link
                 href="/search"
-                className={`px-4 py-2 rounded-xl font-bold text-sm flex items-center gap-2 transition-all ${
+                className={`group px-4 py-2 rounded-xl font-bold text-sm flex items-center gap-2 transition-all ${
                   pathname === "/search"
                     ? "bg-[#F59E0B] text-[#171717] shadow-sm"
                     : "text-slate-200 hover:bg-[#23487A] hover:text-white"
                 }`}
               >
                 <Search className={`w-4 h-4 ${pathname === "/search" ? "text-[#171717]" : "text-[#00A3C4]"}`} />
-                <span>{t("nav.searchSchemes")}</span>
+                <span className="inline-block transition-transform duration-200 group-hover:scale-105">
+                  {t("nav.searchSchemes")}
+                </span>
               </Link>
               <a
                 href="#about"
-                className="px-4 py-2 rounded-xl font-semibold text-sm text-slate-200 hover:bg-[#23487A] hover:text-white transition-all"
+                className="group px-4 py-2 rounded-xl font-semibold text-sm text-slate-200 hover:bg-[#23487A] hover:text-white transition-all"
               >
-                {t("nav.about")}
+                <span className="inline-block transition-transform duration-200 group-hover:scale-105">
+                  {t("nav.about")}
+                </span>
               </a>
             </nav>
 
-            {/* Right Action: Citizen Profile */}
+            {/* Right Action: Citizen Profile / Auth0 */}
             <div className="hidden md:flex items-center gap-3">
-              <button
-                type="button"
-                onClick={() => setAuthModalOpen(true)}
-                className="flex items-center gap-2 bg-[#122844] hover:bg-[#23487A] text-white px-4 py-2 rounded-xl font-semibold text-xs border border-[#23487A] transition-all hover:border-[#00A3C4] shadow-sm"
-                id="citizen-auth-button"
-              >
-                <User className="w-4 h-4 text-[#F59E0B]" />
-                <span>{t("nav.citizenLogin")}</span>
-              </button>
+              {isAuthenticated ? (
+                <button
+                  type="button"
+                  onClick={() => setProfileModalOpen(true)}
+                  className="group flex items-center gap-2.5 bg-[#122844] hover:bg-[#23487A] text-white pl-2 pr-3.5 py-1.5 rounded-xl font-semibold text-xs border border-[#23487A] transition-all hover:border-[#F59E0B] shadow-sm"
+                  id="citizen-auth-button"
+                  aria-label="View Citizen Profile"
+                >
+                  <div className="w-7 h-7 rounded-lg bg-[#F59E0B] text-[#171717] font-black text-xs flex items-center justify-center shadow-xs">
+                    {user?.name ? user.name.charAt(0).toUpperCase() : "C"}
+                  </div>
+                  <div className="text-left">
+                    <div className="text-xs font-bold text-white max-w-[120px] truncate leading-tight">
+                      {user?.name}
+                    </div>
+                    <div className="text-[10px] text-[#00A3C4] font-medium leading-none mt-0.5">
+                      {user?.demographics?.occupation
+                        ? `${user.demographics.occupation}${user.demographics.state ? ` • ${user.demographics.state}` : ""}`
+                        : (user?.demographics?.state || "Set Demographics")}
+                    </div>
+                  </div>
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => setLoginModalOpen(true)}
+                  className="group flex items-center gap-2 bg-[#122844] hover:bg-[#23487A] text-white px-4 py-2 rounded-xl font-semibold text-xs border border-[#23487A] transition-all hover:border-[#00A3C4] shadow-sm"
+                  id="citizen-auth-button"
+                >
+                  <User className="w-4 h-4 text-[#F59E0B]" />
+                  <span className="inline-block transition-transform duration-200 group-hover:scale-105">
+                    {t("nav.citizenLogin")}
+                  </span>
+                </button>
+              )}
             </div>
 
             {/* Mobile Menu Trigger */}
@@ -367,90 +419,80 @@ export default function Navbar() {
             <Link
               href="/"
               onClick={() => setMobileMenuOpen(false)}
-              className={`flex items-center gap-2 px-4 py-3 rounded-xl font-bold text-base ${
+              className={`group flex items-center gap-2 px-4 py-3 rounded-xl font-bold text-base ${
                 pathname === "/" ? "bg-[#F59E0B] text-[#171717]" : "text-white bg-[#1A365D]"
               }`}
             >
               <Mic className="w-5 h-5 text-[#F59E0B]" />
-              <span>{t("nav.voiceAssistant")}</span>
+              <span className="inline-block transition-transform duration-200 group-hover:scale-105">
+                {t("nav.voiceAssistant")}
+              </span>
             </Link>
             <Link
               href="/search"
               onClick={() => setMobileMenuOpen(false)}
-              className={`flex items-center gap-2 px-4 py-3 rounded-xl font-bold text-base ${
+              className={`group flex items-center gap-2 px-4 py-3 rounded-xl font-bold text-base ${
                 pathname === "/search" ? "bg-[#F59E0B] text-[#171717]" : "text-white bg-[#1A365D]"
               }`}
             >
               <Search className="w-5 h-5 text-[#00A3C4]" />
-              <span>{t("nav.searchSchemes")}</span>
+              <span className="inline-block transition-transform duration-200 group-hover:scale-105">
+                {t("nav.searchSchemes")}
+              </span>
             </Link>
-            <button
-              type="button"
-              onClick={() => {
-                setMobileMenuOpen(false);
-                setAuthModalOpen(true);
-              }}
-              className="w-full text-left px-4 py-3 rounded-xl font-bold text-base text-white bg-[#1A365D] hover:bg-[#23487A] flex items-center gap-2"
-            >
-              <User className="w-4 h-4 text-[#F59E0B]" />
-              <span>{t("nav.citizenLogin")}</span>
-            </button>
+            {isAuthenticated ? (
+              <button
+                type="button"
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  setProfileModalOpen(true);
+                }}
+                className="group w-full text-left px-4 py-3 rounded-xl font-bold text-base text-white bg-[#1A365D] hover:bg-[#23487A] flex items-center justify-between"
+              >
+                <div className="flex items-center gap-2.5">
+                  <div className="w-7 h-7 rounded-lg bg-[#F59E0B] text-[#171717] font-bold text-xs flex items-center justify-center">
+                    {user?.name ? user.name.charAt(0).toUpperCase() : "C"}
+                  </div>
+                  <div>
+                    <div className="text-sm font-bold text-white">{user?.name}</div>
+                    <div className="text-xs text-[#00A3C4] font-medium">
+                      {user?.demographics?.occupation
+                        ? `${user.demographics.occupation}${user.demographics.state ? ` • ${user.demographics.state}` : ""}`
+                        : (user?.demographics?.state || "Set Demographics")}
+                    </div>
+                  </div>
+                </div>
+                <span className="text-xs font-semibold text-[#F59E0B]">Edit Profile</span>
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  setLoginModalOpen(true);
+                }}
+                className="group w-full text-left px-4 py-3 rounded-xl font-bold text-base text-white bg-[#1A365D] hover:bg-[#23487A] flex items-center gap-2"
+              >
+                <User className="w-4 h-4 text-[#F59E0B]" />
+                <span className="inline-block transition-transform duration-200 group-hover:scale-105">
+                  {t("nav.citizenLogin")}
+                </span>
+              </button>
+            )}
           </div>
         )}
       </header>
 
-      {/* Citizen Login Modal */}
-      {authModalOpen && (
-        <div 
-          className="fixed inset-0 bg-slate-950/70 z-50 flex items-center justify-center p-4 backdrop-blur-xs"
-          role="dialog"
-          aria-modal="true"
-        >
-          <div className="bg-[#1A365D] border border-[#23487A] rounded-xl max-w-md w-full p-6 text-white shadow-2xl">
-            <div className="flex items-center justify-between pb-3 border-b border-[#23487A]">
-              <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-lg bg-[#F59E0B]/20 text-[#F59E0B] flex items-center justify-center">
-                  <ShieldCheck className="w-5 h-5" />
-                </div>
-                <h3 className="text-lg font-bold text-white">{t("auth.title")}</h3>
-              </div>
-              <button 
-                onClick={() => setAuthModalOpen(false)}
-                className="text-slate-300 hover:text-white p-1 rounded-lg hover:bg-[#23487A]"
-                aria-label="Close modal"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-            <div className="py-4 space-y-4">
-              <p className="text-slate-200 text-sm leading-relaxed">
-                {t("auth.desc")}
-              </p>
-              <div className="bg-[#122844] p-4 rounded-xl border border-[#23487A] space-y-2">
-                <div className="text-[11px] text-[#00A3C4] font-bold uppercase tracking-wider">
-                  {t("auth.configuredIdp")}
-                </div>
-                <div className="flex items-center justify-between text-sm text-slate-200">
-                  <span>{t("auth.universalLogin")}</span>
-                  <span className="bg-[#00829D]/30 text-[#00A3C4] text-xs px-2.5 py-0.5 rounded-full font-bold border border-[#00A3C4]">
-                    {t("auth.enabled")}
-                  </span>
-                </div>
-              </div>
-              <button
-                type="button"
-                onClick={() => {
-                  alert("Auth0 Universal Login redirect activated. Connected to secure profile pre-filtering.");
-                  setAuthModalOpen(false);
-                }}
-                className="w-full bg-[#F59E0B] hover:bg-[#D97706] text-[#171717] font-bold py-3 rounded-xl text-sm transition-all shadow-sm"
-              >
-                {t("auth.proceed")}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Citizen Authentication & Profile Modals */}
+      <CitizenLoginModal
+        isOpen={loginModalOpen}
+        onClose={() => setLoginModalOpen(false)}
+      />
+      <CitizenProfileModal
+        isOpen={profileModalOpen}
+        onClose={() => setProfileModalOpen(false)}
+      />
+
     </>
   );
 }
