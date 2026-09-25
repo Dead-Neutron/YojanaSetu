@@ -70,7 +70,7 @@ def search_schemes(
                 if state and state != "All":
                     q = q.filter(or_(Scheme.state == state, Scheme.level == "Central"))
                 if category and category != "All":
-                    q = q.filter(Scheme.scheme_category == category)
+                    q = q.filter(Scheme.scheme_category.ilike(f"%{category}%"))
                 if gender and gender != "All":
                     q = q.filter(or_(Scheme.gender == gender, Scheme.gender == "All"))
                 if occupation and occupation != "All":
@@ -114,9 +114,10 @@ def search_schemes(
         ]
 
     if category and category != "All":
+        c_lower = category.lower()
         filtered = [
             s for s in filtered
-            if s.get("category") == category or s.get("scheme_category") == category
+            if c_lower in (s.get("category") or "").lower() or c_lower in (s.get("scheme_category") or "").lower()
         ]
 
     if gender and gender != "All":

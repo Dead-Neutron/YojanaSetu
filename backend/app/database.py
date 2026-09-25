@@ -65,8 +65,11 @@ def get_db() -> Generator[Session, None, None]:
 def init_db():
     """Create tables if they do not exist."""
     try:
+        # Import models so they are registered with SQLAlchemy metadata
+        import app.models  # noqa: F401
         if engine is not None:
             Base.metadata.create_all(bind=engine)
             logger.info("Database schema verified/created successfully.")
     except Exception as e:
         logger.warning(f"Database schema auto-creation encountered notice: {e}")
+

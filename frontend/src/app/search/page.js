@@ -81,21 +81,46 @@ export default function SearchPage() {
   const [isLiveBackend, setIsLiveBackend] = useState(false);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [categoriesList, setCategoriesList] = useState(CATEGORIES);
+  const [statesList, setStatesList] = useState(STATES);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
       const params = new URLSearchParams(window.location.search);
       const cat = params.get("category");
-      if (cat && CATEGORIES.includes(cat)) {
+      if (cat) {
         setSelectedCategory(cat);
       }
     }
+  }, []);
+
+  // Fetch dynamic categories and states from FastAPI backend if available
+  useEffect(() => {
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v1";
+    fetch(`${apiUrl}/schemes/categories`)
+      .then((res) => (res.ok ? res.json() : null))
+      .then((cats) => {
+        if (cats && Array.isArray(cats) && cats.length > 0) {
+          setCategoriesList(["All Categories", ...cats]);
+        }
+      })
+      .catch(() => {});
+
+    fetch(`${apiUrl}/schemes/states`)
+      .then((res) => (res.ok ? res.json() : null))
+      .then((sts) => {
+        if (sts && Array.isArray(sts) && sts.length > 0) {
+          setStatesList(["All States & UTs", "Central / All India", ...sts]);
+        }
+      })
+      .catch(() => {});
   }, []);
 
   // Reset to page 1 whenever filters change
   useEffect(() => {
     setPage(1);
   }, [keyword, selectedCategory, selectedState, selectedGender, selectedOccupation, selectedCaste, selectedLevel]);
+
 
   // Fetch schemes from FastAPI backend with automatic local fallback
   useEffect(() => {
@@ -355,7 +380,7 @@ export default function SearchPage() {
                 onChange={(e) => setSelectedState(e.target.value)}
                 className="w-full p-2.5 bg-[#FFFFFF] border border-[#E5E5E5] rounded-xl text-sm font-medium text-[#171717] focus:border-[#00A3C4] focus:outline-none"
               >
-                {STATES.map((state) => (
+                {statesList.map((state) => (
                   <option key={state} value={state}>
                     {state}
                   </option>
@@ -374,7 +399,7 @@ export default function SearchPage() {
                 onChange={(e) => setSelectedCategory(e.target.value)}
                 className="w-full p-2.5 bg-[#FFFFFF] border border-[#E5E5E5] rounded-xl text-sm font-medium text-[#171717] focus:border-[#00A3C4] focus:outline-none"
               >
-                {CATEGORIES.map((cat) => (
+                {categoriesList.map((cat) => (
                   <option key={cat} value={cat}>
                     {cat}
                   </option>
@@ -575,7 +600,7 @@ export default function SearchPage() {
                   onChange={(e) => setSelectedState(e.target.value)}
                   className="w-full p-2.5 border border-[#E5E5E5] rounded-xl bg-[#FFFFFF] text-sm font-medium text-[#171717]"
                 >
-                  {STATES.map((s) => (<option key={s} value={s}>{s}</option>))}
+                  {statesList.map((s) => (<option key={s} value={s}>{s}</option>))}
                 </select>
               </div>
 
@@ -586,7 +611,7 @@ export default function SearchPage() {
                   onChange={(e) => setSelectedCategory(e.target.value)}
                   className="w-full p-2.5 border border-[#E5E5E5] rounded-xl bg-[#FFFFFF] text-sm font-medium text-[#171717]"
                 >
-                  {CATEGORIES.map((c) => (<option key={c} value={c}>{c}</option>))}
+                  {categoriesList.map((c) => (<option key={c} value={c}>{c}</option>))}
                 </select>
               </div>
 
@@ -630,7 +655,7 @@ export default function SearchPage() {
                 onClick={() => setMobileFilterOpen(false)}
                 className="w-full bg-[#F59E0B] hover:bg-[#D97706] text-[#171717] py-3 rounded-xl font-bold text-sm shadow-sm"
               >
-                {t("search.applyFilters", { count: filteredSchemes.length })}
+                {t("search.applyFilters", { count: totalCount })}
               </button>
               <button
                 type="button"
