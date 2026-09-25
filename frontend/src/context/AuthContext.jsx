@@ -9,52 +9,9 @@ const AuthContext = createContext({
   isLoading: true,
   authConfig: { domain: "", clientId: "", isConfigured: false },
   loginWithAuth0: () => {},
-  loginWithDemo: () => {},
   logout: () => {},
   updateDemographics: () => {},
 });
-
-const DEMO_PROFILES = {
-  farmer: {
-    sub: "auth0|demo_farmer_01",
-    name: "Ramesh Kumar",
-    email: "ramesh.kumar@kisan.in",
-    picture: null,
-    demographics: {
-      state: "Bihar",
-      occupation: "Farmer",
-      gender: "Male",
-      caste: "OBC",
-      age: 42,
-    },
-  },
-  artisan: {
-    sub: "auth0|demo_artisan_02",
-    name: "Sunita Devi",
-    email: "sunita.devi@karigar.in",
-    picture: null,
-    demographics: {
-      state: "West Bengal",
-      occupation: "Artisan",
-      gender: "Female",
-      caste: "SC",
-      age: 38,
-    },
-  },
-  student: {
-    sub: "auth0|demo_student_03",
-    name: "Aarav Sharma",
-    email: "aarav.sharma@vidya.in",
-    picture: null,
-    demographics: {
-      state: "Maharashtra",
-      occupation: "Student",
-      gender: "Male",
-      caste: "General",
-      age: 20,
-    },
-  },
-};
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
@@ -158,48 +115,25 @@ export function AuthProvider({ children }) {
     const domain = authConfig.domain || process.env.NEXT_PUBLIC_AUTH0_DOMAIN;
     const clientId = authConfig.clientId || process.env.NEXT_PUBLIC_AUTH0_CLIENT_ID;
 
-    if (domain && clientId && !domain.startsWith("your-")) {
-      const redirectUri = window.location.origin;
-      const audienceParam = authConfig.audience ? `&audience=${encodeURIComponent(authConfig.audience)}` : "";
+    if (domain && clientId && !domain.startsWith("your-") && domain !== "dev-yojanasetu.us.auth0.com") {
+      const redirectUri = (process.env.NEXT_PUBLIC_AUTH0_REDIRECT_URI || window.location.origin).replace(/\/$/, "");
+      // Only attach audience if a real custom API audience is registered in Auth0
+      const hasCustomAudience = authConfig.audience && !authConfig.audience.includes("yojanasetu-api.local");
+      const audienceParam = hasCustomAudience ? `&audience=${encodeURIComponent(authConfig.audience)}` : "";
       const nonce = Math.random().toString(36).substring(2, 15);
       const authUrl = `https://${domain}/authorize?client_id=${clientId}&response_type=token%20id_token&redirect_uri=${encodeURIComponent(
         redirectUri
       )}&scope=openid%20profile%20email${audienceParam}&nonce=${nonce}`;
 
       window.location.href = authUrl;
+      return true;
     } else {
-      // If Auth0 credentials not yet set in .env, activate default demo login
-      loginWithDemo("farmer");
+      // Auth0 not yet configured with real user tenant
+      return false;
     }
   };
 
-  // 3. One-Click Demo Login (Enables rapid evaluation without external Auth0 account)
-  const loginWithDemo = (role = "farmer") => {
-    const profile = DEMO_PROFILES[role] || DEMO_PROFILES.farmer;
-    const fakeToken = `demo-token-${role}-${Date.now()}`;
-
-    setUser(profile);
-    setToken(fakeToken);
-
-    if (typeof window !== "undefined") {
-      localStorage.setItem("yojanasetu_auth_user", JSON.stringify(profile));
-      localStorage.setItem("yojanasetu_auth_token", fakeToken);
-    }
-
-    // Sync demographics to backend
-    if (profile.demographics) {
-      fetch(`${apiUrl}/auth/profile`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${fakeToken}`,
-        },
-        body: JSON.stringify(profile.demographics),
-      }).catch(() => {});
-    }
-  };
-
-  // 4. Logout (Clears local state and localStorage)
+  // 3. Logout (Clears local state and localStorage)
   const logout = () => {
     setUser(null);
     setToken(null);
@@ -210,12 +144,12 @@ export function AuthProvider({ children }) {
 
     // If live Auth0 is configured, redirect to Auth0 logout endpoint
     if (authConfig.isConfigured && authConfig.domain && authConfig.clientId) {
-      const returnTo = encodeURIComponent(window.location.origin);
+      const returnTo = encodeURIComponent((process.env.NEXT_PUBLIC_AUTH0_REDIRECT_URI || window.location.origin).replace(/\/$/, ""));
       window.location.href = `https://${authConfig.domain}/v2/logout?client_id=${authConfig.clientId}&returnTo=${returnTo}`;
     }
   };
 
-  // 5. Update Citizen Demographics
+  // 4. Update Citizen Demographics
   const updateDemographics = (newDemographics) => {
     if (!user) return;
     const updatedUser = {
@@ -250,7 +184,6 @@ export function AuthProvider({ children }) {
         isLoading,
         authConfig,
         loginWithAuth0,
-        loginWithDemo,
         logout,
         updateDemographics,
       }}

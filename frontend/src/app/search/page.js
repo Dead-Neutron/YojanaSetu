@@ -105,7 +105,8 @@ export default function SearchPage() {
       .then((res) => (res.ok ? res.json() : null))
       .then((cats) => {
         if (cats && Array.isArray(cats) && cats.length > 0) {
-          setCategoriesList(["All Categories", ...cats]);
+          const uniqueCats = Array.from(new Set(["All Categories", ...cats]));
+          setCategoriesList(uniqueCats);
         }
       })
       .catch(() => {});
@@ -114,7 +115,8 @@ export default function SearchPage() {
       .then((res) => (res.ok ? res.json() : null))
       .then((sts) => {
         if (sts && Array.isArray(sts) && sts.length > 0) {
-          setStatesList(["All States & UTs", "Central / All India", ...sts]);
+          const uniqueStates = Array.from(new Set(["All States & UTs", "Central / All India", ...sts]));
+          setStatesList(uniqueStates);
         }
       })
       .catch(() => {});
@@ -420,8 +422,8 @@ export default function SearchPage() {
                 onChange={(e) => setSelectedState(e.target.value)}
                 className="w-full p-2.5 bg-[#FFFFFF] border border-[#E5E5E5] rounded-xl text-sm font-medium text-[#171717] focus:border-[#00A3C4] focus:outline-none"
               >
-                {statesList.map((state) => (
-                  <option key={state} value={state}>
+                {statesList.map((state, idx) => (
+                  <option key={`desktop-state-${idx}-${state}`} value={state}>
                     {state}
                   </option>
                 ))}
@@ -439,8 +441,8 @@ export default function SearchPage() {
                 onChange={(e) => setSelectedCategory(e.target.value)}
                 className="w-full p-2.5 bg-[#FFFFFF] border border-[#E5E5E5] rounded-xl text-sm font-medium text-[#171717] focus:border-[#00A3C4] focus:outline-none"
               >
-                {categoriesList.map((cat) => (
-                  <option key={cat} value={cat}>
+                {categoriesList.map((cat, idx) => (
+                  <option key={`desktop-cat-${idx}-${cat}`} value={cat}>
                     {cat}
                   </option>
                 ))}
@@ -660,7 +662,7 @@ export default function SearchPage() {
                   onChange={(e) => setSelectedState(e.target.value)}
                   className="w-full p-2.5 border border-[#E5E5E5] rounded-xl bg-[#FFFFFF] text-sm font-medium text-[#171717]"
                 >
-                  {statesList.map((s) => (<option key={s} value={s}>{s}</option>))}
+                  {statesList.map((s, idx) => (<option key={`mobile-state-${idx}-${s}`} value={s}>{s}</option>))}
                 </select>
               </div>
 
@@ -671,7 +673,7 @@ export default function SearchPage() {
                   onChange={(e) => setSelectedCategory(e.target.value)}
                   className="w-full p-2.5 border border-[#E5E5E5] rounded-xl bg-[#FFFFFF] text-sm font-medium text-[#171717]"
                 >
-                  {categoriesList.map((c) => (<option key={c} value={c}>{c}</option>))}
+                  {categoriesList.map((c, idx) => (<option key={`mobile-cat-${idx}-${c}`} value={c}>{c}</option>))}
                 </select>
               </div>
 

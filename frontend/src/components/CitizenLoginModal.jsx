@@ -1,14 +1,26 @@
 "use client";
 
-import { X, ShieldCheck, UserCheck, ArrowRight, Sparkles, CheckCircle2 } from "lucide-react";
+import { useState } from "react";
+import { X, ShieldCheck, UserCheck, ArrowRight, CheckCircle2, AlertCircle, Key } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { useLanguage } from "@/i18n/LanguageContext";
 
 export default function CitizenLoginModal({ isOpen, onClose }) {
   const { t } = useLanguage();
-  const { loginWithAuth0, loginWithDemo, authConfig } = useAuth();
+  const { loginWithAuth0, authConfig } = useAuth();
+  const [configMissing, setConfigMissing] = useState(false);
 
   if (!isOpen) return null;
+
+  const handleAuth0Click = () => {
+    setConfigMissing(false);
+    const initiated = loginWithAuth0();
+    if (initiated) {
+      onClose();
+    } else {
+      setConfigMissing(true);
+    }
+  };
 
   return (
     <div
@@ -49,94 +61,56 @@ export default function CitizenLoginModal({ isOpen, onClose }) {
           <div className="bg-[#0B1E36] border border-[#00A3C4]/40 rounded-xl p-4 flex items-start gap-3">
             <CheckCircle2 className="w-5 h-5 text-[#00A3C4] shrink-0 mt-0.5" />
             <div className="text-xs leading-relaxed text-slate-200">
-              <strong className="text-white font-bold block mb-0.5">
+              <strong className="text-white font-bold block mb-0.5 text-sm">
                 Authentication is 100% Optional
               </strong>
-              All government welfare schemes, voice queries, filters, and documents are publicly accessible without creating an account. Sign in only if you wish to save demographic preferences and bookmark schemes.
+              All government welfare schemes, multilingual voice queries, attribute filters, and official scheme documentation are completely accessible without creating an account. Sign in only if you wish to link your verified Auth0 citizen profile.
             </div>
           </div>
+
+          {/* Configuration Missing Helper Notice */}
+          {configMissing && (
+            <div className="bg-amber-950/40 border border-[#F59E0B]/40 rounded-xl p-4 flex items-start gap-3 text-xs text-amber-200">
+              <AlertCircle className="w-5 h-5 text-[#F59E0B] shrink-0 mt-0.5" />
+              <div className="space-y-1">
+                <strong className="text-white block font-bold">
+                  Auth0 Credentials Not Configured
+                </strong>
+                <p>
+                  To authenticate with Auth0, add your Auth0 Domain and Client ID to{" "}
+                  <code className="bg-black/40 px-1.5 py-0.5 rounded text-[#F59E0B]">frontend/.env.local</code>:
+                </p>
+                <pre className="bg-black/50 p-2 rounded text-[11px] font-mono text-slate-300 overflow-x-auto mt-1">
+                  NEXT_PUBLIC_AUTH0_DOMAIN=your-tenant.us.auth0.com{"\n"}
+                  NEXT_PUBLIC_AUTH0_CLIENT_ID=your_client_id
+                </pre>
+                <p className="pt-1">
+                  Or simply continue below as a guest citizen with 100% full access to all features!
+                </p>
+              </div>
+            </div>
+          )}
 
           {/* Primary Action: Auth0 Universal Login */}
           <div className="space-y-3">
             <button
               type="button"
-              onClick={() => {
-                loginWithAuth0();
-                onClose();
-              }}
-              className="w-full bg-[#F59E0B] hover:bg-[#D97706] text-[#171717] font-black py-3.5 px-4 rounded-xl text-sm flex items-center justify-center gap-2 transition-all shadow-md active:scale-98"
+              onClick={handleAuth0Click}
+              className="w-full bg-[#F59E0B] hover:bg-[#D97706] text-[#171717] font-black py-3.5 px-4 rounded-xl text-sm flex items-center justify-center gap-2 transition-all shadow-md active:scale-98 cursor-pointer"
             >
               <UserCheck className="w-4 h-4" />
               <span>Continue with Auth0 Universal Login</span>
               <ArrowRight className="w-4 h-4 ml-auto" />
             </button>
             <p className="text-[11px] text-center text-slate-300">
-              Supports Google, Email Passwordless, or Single Sign-On via standard OpenID Connect.
+              Redirects securely to Auth0 for Google, Email, or Passwordless authentication.
             </p>
           </div>
 
-          {/* Divider */}
-          <div className="relative flex items-center justify-center">
-            <div className="border-t border-[#23487A] w-full"></div>
-            <span className="bg-[#1A365D] px-3 text-[11px] text-slate-400 uppercase tracking-wider font-semibold">
-              Instant Demo Profiles
-            </span>
-            <div className="border-t border-[#23487A] w-full"></div>
-          </div>
-
-          {/* One-Click Demo Profiles for Rapid Testing */}
-          <div className="space-y-2">
-            <div className="text-xs font-semibold text-slate-300 flex items-center gap-1.5">
-              <Sparkles className="w-3.5 h-3.5 text-[#F59E0B]" />
-              <span>Select a citizen profile to test personalized discovery:</span>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
-              <button
-                type="button"
-                onClick={() => {
-                  loginWithDemo("farmer");
-                  onClose();
-                }}
-                className="bg-[#122844] hover:bg-[#23487A] border border-[#23487A] hover:border-[#F59E0B] p-3 rounded-xl text-left transition-all group"
-              >
-                <div className="text-xs font-bold text-white group-hover:text-[#F59E0B]">
-                  Ramesh Kumar
-                </div>
-                <div className="text-[10px] text-[#00A3C4] font-medium">Farmer • Bihar</div>
-                <div className="text-[10px] text-slate-400 mt-1">42 yrs, Male, OBC</div>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => {
-                  loginWithDemo("artisan");
-                  onClose();
-                }}
-                className="bg-[#122844] hover:bg-[#23487A] border border-[#23487A] hover:border-[#F59E0B] p-3 rounded-xl text-left transition-all group"
-              >
-                <div className="text-xs font-bold text-white group-hover:text-[#F59E0B]">
-                  Sunita Devi
-                </div>
-                <div className="text-[10px] text-[#00A3C4] font-medium">Artisan • W. Bengal</div>
-                <div className="text-[10px] text-slate-400 mt-1">38 yrs, Female, SC</div>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => {
-                  loginWithDemo("student");
-                  onClose();
-                }}
-                className="bg-[#122844] hover:bg-[#23487A] border border-[#23487A] hover:border-[#F59E0B] p-3 rounded-xl text-left transition-all group"
-              >
-                <div className="text-xs font-bold text-white group-hover:text-[#F59E0B]">
-                  Aarav Sharma
-                </div>
-                <div className="text-[10px] text-[#00A3C4] font-medium">Student • Maharashtra</div>
-                <div className="text-[10px] text-slate-400 mt-1">20 yrs, Male, General</div>
-              </button>
-            </div>
+          {/* Privacy & Trust Badge */}
+          <div className="border border-[#23487A] bg-[#122844] rounded-xl p-3 flex items-center gap-2 text-xs text-slate-300">
+            <Key className="w-4 h-4 text-[#00A3C4] shrink-0" />
+            <span>OpenID Connect standard with PKCE. Tokens are validated securely on the backend.</span>
           </div>
         </div>
 
