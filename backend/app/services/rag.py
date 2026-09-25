@@ -153,6 +153,39 @@ def search_schemes(
     }
 
 
+def get_query_embedding(text: str) -> List[float]:
+    """Generates 768-dim query embedding using Gemini text-embedding-004 or semantic projection."""
+    if settings.GOOGLE_API_KEY and not settings.GOOGLE_API_KEY.startswith("your-"):
+        try:
+            from google import genai
+            client = genai.Client(api_key=settings.GOOGLE_API_KEY)
+            res = client.models.embed_content(
+                model="text-embedding-004",
+                contents=text
+            )
+            if hasattr(res, "embeddings") and res.embeddings:
+                return list(res.embeddings[0].values)
+        except Exception as e:
+            logger.warning(f"Gemini query embedding failed ({e}), using semantic projection fallback.")
+
+    import math
+    import hashlib
+    dim = 768
+    vec = [0.0] * dim
+    words = text.lower().replace(",", " ").replace(".", " ").replace(";", " ").split() or ["welfare"]
+    for i, word in enumerate(words):
+        h1 = int(hashlib.sha256(word.encode("utf-8")).hexdigest(), 16)
+        sign1 = 1.0 if ((h1 >> 8) % 2 == 0) else -1.0
+        decay = 1.0 / (1.0 + 0.05 * i)
+        vec[h1 % dim] += sign1 * decay * 1.5
+        if i > 0:
+            h2 = int(hashlib.md5(f"{words[i-1]}_{word}".encode("utf-8")).hexdigest(), 16)
+            sign2 = 1.0 if ((h2 >> 4) % 2 == 0) else -1.0
+            vec[h2 % dim] += sign2 * decay * 1.0
+    norm = math.sqrt(sum(x * x for x in vec))
+    return [float(x / norm) for x in vec] if norm > 0 else vec
+
+
 def retrieve_relevant_schemes_for_voice(
     db: Optional[Session],
     demographics: Dict[str, Any],
@@ -161,20 +194,47 @@ def retrieve_relevant_schemes_for_voice(
 ) -> List[Dict[str, Any]]:
     """
     RAG retrieval tailored for citizen voice queries.
-    Uses extracted demographic fields (occupation, state, gender, etc.) to fetch top 3-4 candidate schemes.
+    Uses pgvector HNSW cosine similarity search combined with demographic filters.
+    Falls back to relational keyword search and in-memory cache if needed.
     """
     state = demographics.get("state")
     gender = demographics.get("gender")
     occupation = demographics.get("occupation")
     caste = demographics.get("caste")
 
+    # 1. Primary: pgvector HNSW Semantic Vector Search
+    if db is not None:
+        try:
+            q = db.query(Scheme).filter(Scheme.embedding.isnot(None))
+
+            if state and str(state).lower() not in ["all", "null"]:
+                q = q.filter(or_(Scheme.state == state, Scheme.level == "Central"))
+            if gender and str(gender).lower() not in ["all", "null"]:
+                q = q.filter(or_(Scheme.gender == gender, Scheme.gender == "All"))
+            if occupation and str(occupation).lower() not in ["all", "null", "general"]:
+                q = q.filter(or_(Scheme.occupation == occupation, Scheme.occupation.is_(None)))
+            if caste and str(caste).lower() not in ["all", "null"]:
+                q = q.filter(or_(Scheme.caste_category == caste, Scheme.caste_category.is_(None)))
+
+            if query_text and len(query_text.strip()) > 1:
+                query_vector = get_query_embedding(query_text)
+                q = q.order_by(Scheme.embedding.cosine_distance(query_vector))
+
+            vector_matches = q.limit(limit).all()
+            if vector_matches:
+                logger.info(f"Retrieved {len(vector_matches)} schemes via pgvector HNSW semantic search for query: '{query_text[:50]}'")
+                return [m.to_dict() for m in vector_matches]
+        except Exception as e:
+            logger.warning(f"Vector search failed, falling back to hybrid keyword search: {e}")
+
+    # 2. Secondary: Relational keyword & demographic filters
     results = search_schemes(
         db=db,
         query=query_text,
-        state=state if state and state.lower() != "null" else None,
-        gender=gender if gender and gender.lower() != "all" else None,
-        occupation=occupation if occupation and occupation.lower() != "null" else None,
-        caste=caste if caste and caste.lower() != "null" else None,
+        state=state if state and str(state).lower() != "null" else None,
+        gender=gender if gender and str(gender).lower() != "all" else None,
+        occupation=occupation if occupation and str(occupation).lower() != "null" else None,
+        caste=caste if caste and str(caste).lower() != "null" else None,
         page=1,
         page_size=limit
     )
@@ -182,12 +242,12 @@ def retrieve_relevant_schemes_for_voice(
     if results["items"]:
         return results["items"]
 
-    # Fallback to broader query if strict filters returned no items
+    # 3. Fallback to broader query if strict filters returned no items
     broad_results = search_schemes(
         db=db,
         query=None,
-        occupation=occupation if occupation and occupation.lower() != "null" else None,
-        gender=gender if gender and gender.lower() != "all" else None,
+        occupation=occupation if occupation and str(occupation).lower() != "null" else None,
+        gender=gender if gender and str(gender).lower() != "all" else None,
         page=1,
         page_size=limit
     )

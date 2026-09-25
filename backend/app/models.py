@@ -1,5 +1,6 @@
 from datetime import datetime
 from sqlalchemy import Column, Integer, String, Text, DateTime
+from pgvector.sqlalchemy import Vector
 from app.database import Base
 
 
@@ -29,7 +30,7 @@ class Scheme(Base):
     occupation = Column(String(255), nullable=True)
     income_bracket = Column(String(255), nullable=True)
     caste_category = Column(String(255), nullable=True)
-    embedding = Column(Text, nullable=True)  # JSON-serialized 768-dim vector or pgvector format
+    embedding = Column(Vector(768), nullable=True)  # Native pgvector 768-dimensional embedding
     created_at = Column(DateTime, default=datetime.utcnow)
 
     def to_dict(self):

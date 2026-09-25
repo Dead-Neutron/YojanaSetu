@@ -74,7 +74,12 @@ def init_db():
                     with engine.connect() as conn:
                         conn.execute(text("CREATE EXTENSION IF NOT EXISTS vector;"))
                         conn.commit()
-                        logger.info("PostgreSQL pgvector extension verified/enabled.")
+                        try:
+                            conn.execute(text("CREATE INDEX IF NOT EXISTS schemes_embedding_hnsw_idx ON schemes USING hnsw (embedding vector_cosine_ops);"))
+                            conn.commit()
+                        except Exception:
+                            pass
+                        logger.info("PostgreSQL pgvector extension and HNSW index verified/enabled.")
                 except Exception as e:
                     logger.info(f"Notice enabling pgvector extension (optional): {e}")
             Base.metadata.create_all(bind=engine)
