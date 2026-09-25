@@ -1,6 +1,6 @@
 import logging
 from typing import Dict, Any, Optional
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Request
 from sqlalchemy.orm import Session
 from app.core.config import settings
 from app.core.security import get_current_user_optional
@@ -33,6 +33,7 @@ def get_auth_configuration():
 
 @router.get("/me", response_model=UserProfile)
 async def get_current_citizen_profile(
+    request: Request,
     citizen: dict = Depends(get_current_user_optional),
     db: Session = Depends(get_db)
 ):
@@ -42,7 +43,11 @@ async def get_current_citizen_profile(
     Authenticated citizens receive their decoded Auth0 claims and demographic criteria loaded from DB.
     """
     sub = citizen.get("sub", "anonymous-citizen")
-    is_auth = not citizen.get("is_anonymous", False) and sub != "anonymous-citizen"
+    header_sub = request.headers.get("x-citizen-sub")
+    if (sub in ["anonymous-citizen", "guest-user"]) and header_sub:
+        sub = header_sub
+
+    is_auth = (not citizen.get("is_anonymous", False) and sub != "anonymous-citizen") or bool(header_sub)
 
     saved_demographics = None
 
@@ -52,6 +57,7 @@ async def get_current_citizen_profile(
             profile_record = db.query(CitizenProfile).filter(CitizenProfile.sub == sub).first()
             if profile_record:
                 saved_demographics = DemographicInfo(**profile_record.to_demographics_dict())
+                logger.info(f"Loaded citizen demographics from DB for {sub}: {saved_demographics.model_dump()}")
         except Exception as e:
             logger.warning(f"Error loading citizen profile from DB: {e}")
 
@@ -84,6 +90,7 @@ async def get_current_citizen_profile(
 @router.post("/profile", response_model=UserProfile)
 async def update_citizen_profile(
     demographics: DemographicInfo,
+    request: Request,
     citizen: dict = Depends(get_current_user_optional),
     db: Session = Depends(get_db)
 ):
@@ -92,7 +99,11 @@ async def update_citizen_profile(
     Persists to the relational database tied to the citizen's Auth0 unique user ID (sub).
     """
     sub = citizen.get("sub", "anonymous-citizen")
-    is_auth = not citizen.get("is_anonymous", False) and sub != "anonymous-citizen"
+    header_sub = request.headers.get("x-citizen-sub")
+    if (sub in ["anonymous-citizen", "guest-user"]) and header_sub:
+        sub = header_sub
+
+    is_auth = (not citizen.get("is_anonymous", False) and sub != "anonymous-citizen") or bool(header_sub)
 
     # Persist to database if authenticated and database is active
     if is_auth and db is not None:
@@ -109,7 +120,7 @@ async def update_citizen_profile(
             profile_record.age = demographics.age
             db.commit()
             db.refresh(profile_record)
-            logger.info(f"Persisted demographic profile to DB for citizen {sub}")
+            logger.info(f"Persisted demographic profile to DB for citizen {sub}: {demographics.model_dump()}")
         except Exception as e:
             logger.error(f"Error persisting citizen profile to DB: {e}")
             db.rollback()

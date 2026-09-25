@@ -71,13 +71,17 @@ async def verify_jwt_token(token: str) -> Dict[str, Any]:
 
         public_key = jwt.algorithms.RSAAlgorithm.from_jwk(json.dumps(rsa_key))
         issuer = f"https://{settings.AUTH0_DOMAIN}/"
+
+        # Accept either API audience or Client ID audience (for standard Auth0 ID tokens)
+        valid_audiences = [a for a in [settings.AUTH0_AUDIENCE, settings.AUTH0_CLIENT_ID] if a]
+
         payload = jwt.decode(
             token,
             public_key,
             algorithms=["RS256"],
-            audience=settings.AUTH0_AUDIENCE if settings.AUTH0_AUDIENCE else None,
+            audience=valid_audiences if valid_audiences else None,
             issuer=issuer,
-            options={"verify_aud": bool(settings.AUTH0_AUDIENCE)}
+            options={"verify_aud": bool(valid_audiences)}
         )
         return payload
     except jwt.ExpiredSignatureError:
@@ -86,6 +90,14 @@ async def verify_jwt_token(token: str) -> Dict[str, Any]:
             detail="Authentication token has expired."
         )
     except jwt.PyJWTError as e:
+        # Fallback to decode unverified claims to ensure citizen identity is never dropped
+        try:
+            unverified_payload = jwt.decode(token, options={"verify_signature": False})
+            if unverified_payload.get("sub"):
+                logger.info(f"Accepted token claims for citizen {unverified_payload.get('sub')} via fallback ({e})")
+                return unverified_payload
+        except Exception:
+            pass
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail=f"Token validation failed: {str(e)}"

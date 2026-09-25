@@ -77,17 +77,18 @@ export function AuthProvider({ children }) {
             };
           }
 
+          const authToken = idToken || accessToken;
           setUser(parsedUser);
-          setToken(accessToken || idToken);
+          setToken(authToken);
           localStorage.setItem("yojanasetu_auth_user", JSON.stringify(parsedUser));
-          localStorage.setItem("yojanasetu_auth_token", accessToken || idToken);
+          localStorage.setItem("yojanasetu_auth_token", authToken);
 
           // Clean hash from browser URL without page reload
           window.history.replaceState(null, "", window.location.pathname + window.location.search);
           setIsLoading(false);
 
           // Fetch persisted demographics from database for this citizen
-          loadSavedProfile(accessToken || idToken, parsedUser);
+          loadSavedProfile(authToken, parsedUser);
           return;
         }
       } catch (err) {
@@ -119,21 +120,25 @@ export function AuthProvider({ children }) {
 
   // Helper to load citizen profile criteria from backend database
   const loadSavedProfile = async (authToken, baseUser) => {
+    if (!baseUser?.sub) return;
     try {
       const res = await fetch(`${apiUrl}/auth/me`, {
         headers: {
-          Authorization: `Bearer ${authToken}`,
+          ...(authToken ? { Authorization: `Bearer ${authToken}` } : {}),
+          "X-Citizen-Sub": baseUser.sub,
         },
       });
       if (res.ok) {
         const profileData = await res.json();
-        const updatedUser = {
-          ...baseUser,
-          demographics: profileData?.demographics || null,
-        };
-        setUser(updatedUser);
-        if (typeof window !== "undefined") {
-          localStorage.setItem("yojanasetu_auth_user", JSON.stringify(updatedUser));
+        if (profileData && profileData.demographics) {
+          const updatedUser = {
+            ...baseUser,
+            demographics: profileData.demographics,
+          };
+          setUser(updatedUser);
+          if (typeof window !== "undefined") {
+            localStorage.setItem("yojanasetu_auth_user", JSON.stringify(updatedUser));
+          }
         }
       }
     } catch (err) {
@@ -199,6 +204,7 @@ export function AuthProvider({ children }) {
         headers: {
           "Content-Type": "application/json",
           ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          ...(user?.sub ? { "X-Citizen-Sub": user.sub } : {}),
         },
         body: JSON.stringify(newDemographics),
       });

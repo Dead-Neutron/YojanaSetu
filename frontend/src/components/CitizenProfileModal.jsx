@@ -29,14 +29,16 @@ export default function CitizenProfileModal({ isOpen, onClose }) {
   const [age, setAge] = useState(user?.demographics?.age ?? "");
   const [isSaved, setIsSaved] = useState(false);
 
-  // Sync state whenever user demographics load or change from DB
+  // Sync state whenever modal opens or user demographics load/change from DB
   useEffect(() => {
-    setState(user?.demographics?.state || "");
-    setOccupation(user?.demographics?.occupation || "");
-    setGender(user?.demographics?.gender || "");
-    setCaste(user?.demographics?.caste || "");
-    setAge(user?.demographics?.age ?? "");
-  }, [user?.demographics]);
+    if (isOpen) {
+      setState(user?.demographics?.state || "");
+      setOccupation(user?.demographics?.occupation || "");
+      setGender(user?.demographics?.gender || "");
+      setCaste(user?.demographics?.caste || "");
+      setAge(user?.demographics?.age ?? "");
+    }
+  }, [isOpen, user?.demographics]);
 
   if (!isOpen || !user) return null;
 
