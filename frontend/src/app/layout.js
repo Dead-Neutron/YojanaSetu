@@ -2,6 +2,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { LanguageProvider } from "@/i18n/LanguageContext";
 import { AccessibilityProvider } from "@/context/AccessibilityContext";
+import { AuthProvider } from "@/context/AuthContext";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -21,11 +22,13 @@ export default function RootLayout({ children }) {
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
       </head>
       <body className="min-h-full flex flex-col antialiased bg-[#FFFFFF] text-[#171717]" suppressHydrationWarning>
-        <LanguageProvider>
-          <AccessibilityProvider>
-            {children}
-          </AccessibilityProvider>
-        </LanguageProvider>
+        <AuthProvider>
+          <LanguageProvider>
+            <AccessibilityProvider>
+              {children}
+            </AccessibilityProvider>
+          </LanguageProvider>
+        </AuthProvider>
       </body>
     </html>
   );

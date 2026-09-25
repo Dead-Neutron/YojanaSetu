@@ -18,6 +18,8 @@ import SchemeCard from "./SchemeCard";
 import SchemeModal from "./SchemeModal";
 import allSchemes from "../data/schemes.json";
 import { useLanguage } from "@/i18n/LanguageContext";
+import { useAuth } from "@/context/AuthContext";
+
 
 const SAMPLE_QUERIES_BY_LANG = {
   en: [
@@ -102,8 +104,10 @@ const SAMPLE_QUERIES_BY_LANG = {
 
 export default function VoiceAssistant() {
   const { language, t } = useLanguage();
+  const { user, token } = useAuth();
   // State machine: 'idle' | 'listening' | 'processing' | 'speaking'
   const [state, setState] = useState("idle");
+
   const [transcript, setTranscript] = useState("");
   const [spokenResponseText, setSpokenResponseText] = useState("");
   const [matchedSchemes, setMatchedSchemes] = useState([]);
@@ -212,12 +216,19 @@ export default function VoiceAssistant() {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 6000);
 
+      const headers = {};
+      if (token) {
+        headers["Authorization"] = `Bearer ${token}`;
+      }
+
       const res = await fetch(`${apiUrl}/voice-query`, {
         method: "POST",
+        headers,
         body: formData,
         signal: controller.signal
       });
       clearTimeout(timeoutId);
+
 
       if (res.ok) {
         const data = await res.json();

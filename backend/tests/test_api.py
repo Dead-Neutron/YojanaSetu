@@ -159,13 +159,36 @@ async def run_tests():
         assert r_guest.status_code == 200
         print(f"[OK] Anonymous Access: Unauthenticated citizens can access public welfare schemes")
 
-        # 4.2 Auth Bearer Header Handling
-        # If guest mode without Auth0 configured, should accept gracefully
-        r_auth = await client.get("/api/v1/schemes/search", headers={"Authorization": "Bearer test-token"})
-        assert r_auth.status_code == 200
-        print(f"[OK] Auth Token Handling: Verified guest/development mode token handling")
+        # 4.2 Auth0 Public Configuration Endpoint
+        r_auth_conf = await client.get("/api/v1/auth/config")
+        assert r_auth_conf.status_code == 200
+        conf_data = r_auth_conf.json()
+        print(f"[OK] Auth0 Config: domain='{conf_data.get('domain')}', is_configured={conf_data.get('is_configured')}")
 
-        # 4.3 Malformed Payload Handling
+        # 4.3 Citizen Me Endpoint (Anonymous / Universal Access)
+        r_me_guest = await client.get("/api/v1/auth/me")
+        assert r_me_guest.status_code == 200
+        me_guest = r_me_guest.json()
+        assert me_guest["is_authenticated"] is False
+        assert me_guest["sub"] == "anonymous-citizen"
+        print(f"[OK] Auth0 Me (Anonymous Citizen): Status 200, is_authenticated=False (Full Access Permitted)")
+
+        # 4.4 Citizen Demographic Profile Sync
+        demographic_payload = {
+            "state": "Bihar",
+            "age": 35,
+            "gender": "Female",
+            "occupation": "Farmer",
+            "caste": "OBC"
+        }
+        r_profile = await client.post("/api/v1/auth/profile", json=demographic_payload)
+        assert r_profile.status_code == 200
+        prof_data = r_profile.json()
+        assert prof_data["demographics"]["state"] == "Bihar"
+        assert prof_data["demographics"]["occupation"] == "Farmer"
+        print(f"[OK] Citizen Profile Sync: Successfully updated demographic preferences")
+
+        # 4.5 Malformed Payload Handling
         r_bad_audio = await client.post("/api/v1/voice-query", data={"language": "hi"})
         assert r_bad_audio.status_code == 422, "Expected 422 Unprocessable Entity when audio file is missing"
         print(f"[OK] Error Handling: Missing audio payload rejected with 422")

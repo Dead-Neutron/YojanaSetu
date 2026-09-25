@@ -7,12 +7,15 @@ import SchemeCard from "@/components/SchemeCard";
 import SchemeModal from "@/components/SchemeModal";
 import allSchemes from "@/data/schemes.json";
 import { useLanguage } from "@/i18n/LanguageContext";
+import { useAuth } from "@/context/AuthContext";
 import { 
   Search, 
   Filter, 
   X, 
   SlidersHorizontal, 
-  RotateCcw
+  RotateCcw,
+  Sparkles,
+  UserCheck
 } from "lucide-react";
 
 const CATEGORIES = [
@@ -65,6 +68,7 @@ const CASTES = ["All Castes", "General", "OBC", "SC", "ST", "EWS"];
 
 export default function SearchPage() {
   const { t } = useLanguage();
+  const { user, token, isAuthenticated } = useAuth();
   const [keyword, setKeyword] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All Categories");
   const [selectedState, setSelectedState] = useState("All States & UTs");
@@ -147,8 +151,14 @@ export default function SearchPage() {
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 3500);
 
+        const headers = {};
+        if (token) {
+          headers["Authorization"] = `Bearer ${token}`;
+        }
+
         const res = await fetch(`${apiUrl}/schemes/search?${queryParams.toString()}`, {
-          signal: controller.signal
+          signal: controller.signal,
+          headers
         });
         clearTimeout(timeoutId);
 
@@ -241,6 +251,15 @@ export default function SearchPage() {
     setSelectedOccupation("All Occupations");
     setSelectedCaste("All Castes");
     setSelectedLevel("All");
+  };
+
+  const handleApplyProfileFilters = () => {
+    if (!user?.demographics) return;
+    const { state, occupation, gender, caste } = user.demographics;
+    if (state && statesList.includes(state)) setSelectedState(state);
+    if (occupation && OCCUPATIONS.includes(occupation)) setSelectedOccupation(occupation);
+    if (gender && GENDERS.includes(gender)) setSelectedGender(gender);
+    if (caste && CASTES.includes(caste)) setSelectedCaste(caste);
   };
 
   const activeFiltersCount = [
@@ -368,6 +387,27 @@ export default function SearchPage() {
                 </button>
               )}
             </div>
+
+            {/* Optional Citizen Profile Auto-Filter Helper */}
+            {isAuthenticated && user?.demographics && (
+              <div className="bg-[#1A365D]/5 border border-[#1A365D]/20 rounded-xl p-3 text-xs space-y-2">
+                <div className="flex items-center gap-1.5 font-bold text-[#1A365D]">
+                  <Sparkles className="w-3.5 h-3.5 text-[#F59E0B]" />
+                  <span>Citizen Profile Match</span>
+                </div>
+                <p className="text-slate-600 text-[11px] leading-tight">
+                  {user.name || "Citizen"}: {user.demographics.occupation || "General"} ({user.demographics.state || "All India"})
+                </p>
+                <button
+                  type="button"
+                  onClick={handleApplyProfileFilters}
+                  className="w-full py-1.5 px-2 bg-[#1A365D] hover:bg-[#23487A] text-white rounded-lg font-bold text-[11px] transition-colors flex items-center justify-center gap-1"
+                >
+                  <UserCheck className="w-3 h-3 text-[#F59E0B]" />
+                  <span>Apply Profile Filters</span>
+                </button>
+              </div>
+            )}
 
             {/* State Filter */}
             <div className="space-y-1.5">
@@ -593,6 +633,26 @@ export default function SearchPage() {
             </div>
 
             <div className="space-y-4 text-sm font-semibold">
+              {isAuthenticated && user?.demographics && (
+                <div className="bg-[#1A365D]/5 border border-[#1A365D]/20 rounded-xl p-3 text-xs space-y-2">
+                  <div className="flex items-center gap-1.5 font-bold text-[#1A365D]">
+                    <Sparkles className="w-3.5 h-3.5 text-[#F59E0B]" />
+                    <span>Citizen Profile Match</span>
+                  </div>
+                  <p className="text-slate-600 text-[11px] leading-tight">
+                    {user.name || "Citizen"}: {user.demographics.occupation || "General"} ({user.demographics.state || "All India"})
+                  </p>
+                  <button
+                    type="button"
+                    onClick={handleApplyProfileFilters}
+                    className="w-full py-1.5 px-2 bg-[#1A365D] hover:bg-[#23487A] text-white rounded-lg font-bold text-[11px] transition-colors flex items-center justify-center gap-1"
+                  >
+                    <UserCheck className="w-3 h-3 text-[#F59E0B]" />
+                    <span>Apply Profile Filters</span>
+                  </button>
+                </div>
+              )}
+
               <div>
                 <label className="block text-xs font-bold text-[#525252] uppercase mb-1">{t("search.stateLabel")}</label>
                 <select
