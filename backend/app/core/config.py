@@ -25,6 +25,9 @@ class Settings(BaseSettings):
     ELEVENLABS_API_KEY: str = ""
     ELEVENLABS_VOICE_ID: str = "21m00Tcm4TlvDq8ikWAM"
     
+    # Sarvam AI Indic Speech & Translation
+    SARVAM_API_KEY: str = ""
+    
     # Auth0 Authentication
     AUTH0_DOMAIN: str = ""
     AUTH0_CLIENT_ID: str = ""

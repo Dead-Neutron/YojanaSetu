@@ -5,6 +5,7 @@ venv/
 
 # Local Sensitive / Large Data
 PLAN.md
+AGENTS.md
 
 # Environment Credentials & Secrets
 .env

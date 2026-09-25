@@ -1,7 +1,9 @@
 import uuid
-from typing import Optional, Dict
+import io
+import logging
+from typing import Optional, Dict, Any
 from fastapi import APIRouter, UploadFile, File, Form, Depends, Request, HTTPException
-from fastapi.responses import StreamingResponse
+from fastapi.responses import StreamingResponse, Response
 from sqlalchemy.orm import Session
 from app.core.config import settings
 from app.core.limiter import limiter
@@ -9,13 +11,16 @@ from app.core.security import get_current_user_optional
 from app.database import get_db
 from app.services.gemini import process_audio_with_gemini, synthesize_scheme_response
 from app.services.rag import retrieve_relevant_schemes_for_voice
+from app.services.sarvam import synthesize_speech_with_sarvam, clean_script_leakage
 from app.services.elevenlabs import stream_regional_speech
-from app.schemas import VoiceQueryResponse, DemographicInfo
+from app.schemas import VoiceQueryResponse, DemographicInfo, SynthesizeSpeechRequest
+
+logger = logging.getLogger("yojanasetu.voice")
 
 router = APIRouter(tags=["Voice Assistant"])
 
-# In-memory storage for synthesized audio sessions if needed
-_audio_cache: Dict[str, bytes] = {}
+# In-memory storage for synthesized audio sessions
+_audio_cache: Dict[str, Dict[str, Any]] = {}
 
 
 @router.post("/voice-query", response_model=VoiceQueryResponse)
@@ -23,17 +28,19 @@ _audio_cache: Dict[str, bytes] = {}
 async def handle_voice_query(
     request: Request,
     audio: UploadFile = File(..., description="WebM/WAV/MP3 audio blob from browser MediaRecorder"),
-    language: str = Form("en", description="Citizen selected language code (hi, bn, en)"),
+    language: str = Form("en", description="Citizen selected language code (bn, hi, en)"),
+    client_transcript: Optional[str] = Form(None, description="Optional browser SpeechRecognition transcript"),
     db: Session = Depends(get_db),
     citizen: dict = Depends(get_current_user_optional)
 ):
     """
     Multimodal Voice-First Assistant Core.
     1. Ingests raw voice audio blob directly.
-    2. Transcribes and extracts citizen demographics via Gemini Flash multimodal.
+    2. Transcribes & auto-detects language using Sarvam AI Saaras model.
     3. Executes RAG hybrid retrieval over verified government schemes.
-    4. Synthesizes empathetic, vernacular spoken response.
-    5. Returns structured JSON with matching schemes and audio playback URL.
+    4. Synthesizes empathetic, speech-optimized vernacular response with Gemini.
+    5. Generates crystal-clear audio: Sarvam Bulbul (for Bengali/Hindi) or ElevenLabs (for English).
+    6. Returns structured JSON with matching schemes and playable audio URL.
     """
     try:
         audio_bytes = await audio.read()
@@ -42,11 +49,12 @@ async def handle_voice_query(
 
     mime_type = audio.content_type or "audio/webm"
 
-    # Step 1: Multimodal Audio Extraction with Gemini Flash
+    # Step 1: Multimodal Audio Extraction & Translation
     analysis = await process_audio_with_gemini(
         audio_bytes=audio_bytes,
         mime_type=mime_type,
-        preferred_lang=language
+        preferred_lang=language,
+        client_transcript=client_transcript
     )
 
     transcript = analysis.get("transcript", "")
@@ -63,7 +71,7 @@ async def handle_voice_query(
         limit=4
     )
 
-    # Step 3: Regional Response Synthesis
+    # Step 3: Regional Response Synthesis (Gemini speech-optimized localized response)
     synthesis = await synthesize_scheme_response(
         transcript=transcript,
         language=detected_lang,
@@ -72,15 +80,55 @@ async def handle_voice_query(
     )
 
     response_text = synthesis.get("response_text", "")
-    localized_response = synthesis.get("localized_response", response_text)
+    raw_loc = synthesis.get("localized_response", response_text)
+    # Ironclad script leakage sanitizer
+    localized_response = clean_script_leakage(raw_loc, detected_lang)
+    if detected_lang == "en":
+        response_text = localized_response
 
-    # Step 4: ElevenLabs audio URL generation (if configured)
+    # Step 4: High-Fidelity Audio Generation
     audio_url = None
-    if settings.ELEVENLABS_API_KEY and not settings.ELEVENLABS_API_KEY.startswith("your-"):
-        audio_id = str(uuid.uuid4())
-        audio_url = f"{settings.API_V1_STR}/voice-query/audio/{audio_id}"
-        # Store localized response text to stream on demand
-        _audio_cache[audio_id] = localized_response.encode("utf-8")
+    audio_id = str(uuid.uuid4())
+
+    try:
+        if detected_lang != "en" and settings.SARVAM_API_KEY and not settings.SARVAM_API_KEY.startswith("your-"):
+            # Sarvam Bulbul TTS for Indian Regional Languages (e.g. 'roopa' for Bengali, 'ritu' for Hindi)
+            audio_data = await synthesize_speech_with_sarvam(
+                text=localized_response,
+                language_code=f"{detected_lang}-IN"
+            )
+            if audio_data:
+                _audio_cache[audio_id] = {
+                    "data": audio_data,
+                    "media_type": "audio/wav"
+                }
+                audio_url = f"{settings.API_V1_STR}/voice-query/audio/{audio_id}"
+                logger.info(f"Synthesized Sarvam Bulbul audio ({len(audio_data)} bytes) for {detected_lang}")
+        elif detected_lang == "en":
+            if settings.ELEVENLABS_API_KEY and not settings.ELEVENLABS_API_KEY.startswith("your-"):
+                # ElevenLabs for English
+                _audio_cache[audio_id] = {
+                    "text": localized_response,
+                    "media_type": "audio/mpeg",
+                    "is_elevenlabs": True
+                }
+                audio_url = f"{settings.API_V1_STR}/voice-query/audio/{audio_id}"
+                logger.info("ElevenLabs audio queued for English playback")
+            elif settings.SARVAM_API_KEY and not settings.SARVAM_API_KEY.startswith("your-"):
+                # Fallback to Sarvam Bulbul English (aditya)
+                audio_data = await synthesize_speech_with_sarvam(
+                    text=localized_response,
+                    language_code="en-IN"
+                )
+                if audio_data:
+                    _audio_cache[audio_id] = {
+                        "data": audio_data,
+                        "media_type": "audio/wav"
+                    }
+                    audio_url = f"{settings.API_V1_STR}/voice-query/audio/{audio_id}"
+                    logger.info(f"Synthesized Sarvam Bulbul English audio ({len(audio_data)} bytes)")
+    except Exception as e:
+        logger.warning(f"Audio generation failed: {e}")
 
     return VoiceQueryResponse(
         transcript=transcript,
@@ -102,18 +150,66 @@ async def handle_voice_query(
     )
 
 
+@router.post("/voice-query/synthesize-text")
+async def synthesize_text_audio(
+    payload: SynthesizeSpeechRequest
+):
+    """
+    On-demand speech synthesis endpoint for quick topic clicks or replays.
+    Uses Sarvam Bulbul for Indian regional languages and ElevenLabs for English.
+    """
+    text = payload.text.strip()
+    lang = payload.language.strip().lower()
+
+    if not text:
+        raise HTTPException(status_code=400, detail="Text cannot be empty")
+
+    clean_text = clean_script_leakage(text, lang)
+
+    # Priority: Sarvam Bulbul for Indic languages
+    if lang != "en" and settings.SARVAM_API_KEY and not settings.SARVAM_API_KEY.startswith("your-"):
+        audio_bytes = await synthesize_speech_with_sarvam(clean_text, f"{lang}-IN")
+        if audio_bytes:
+            return Response(content=audio_bytes, media_type="audio/wav")
+
+    # Priority: ElevenLabs for English with Sarvam Bulbul fallback
+    if lang == "en":
+        if settings.ELEVENLABS_API_KEY and not settings.ELEVENLABS_API_KEY.startswith("your-"):
+            stream_gen = await stream_regional_speech(clean_text)
+            if stream_gen:
+                return StreamingResponse(stream_gen, media_type="audio/mpeg")
+        if settings.SARVAM_API_KEY and not settings.SARVAM_API_KEY.startswith("your-"):
+            audio_bytes = await synthesize_speech_with_sarvam(clean_text, "en-IN")
+            if audio_bytes:
+                return Response(content=audio_bytes, media_type="audio/wav")
+
+    raise HTTPException(status_code=503, detail="Audio synthesis service currently unavailable")
+
+
 @router.get("/voice-query/audio/{audio_id}")
 async def stream_audio_response(audio_id: str):
     """
-    Zero-latency streaming endpoint for synthesized vernacular speech via ElevenLabs.
+    Serves synthesized vernacular speech via Sarvam Bulbul or ElevenLabs.
     """
-    cached_text_bytes = _audio_cache.get(audio_id)
-    if not cached_text_bytes:
+    cached = _audio_cache.get(audio_id)
+    if not cached:
         raise HTTPException(status_code=404, detail="Audio session expired or not found")
 
-    text = cached_text_bytes.decode("utf-8")
-    stream_gen = await stream_regional_speech(text)
-    if not stream_gen:
+    if cached.get("is_elevenlabs"):
+        text = cached.get("text", "")
+        stream_gen = await stream_regional_speech(text)
+        if stream_gen:
+            return StreamingResponse(stream_gen, media_type="audio/mpeg")
+        # If ElevenLabs stream fails (e.g. quota exceeded), fallback seamlessly to Sarvam Bulbul English
+        if settings.SARVAM_API_KEY and not settings.SARVAM_API_KEY.startswith("your-"):
+            audio_data = await synthesize_speech_with_sarvam(text, "en-IN")
+            if audio_data:
+                return Response(content=audio_data, media_type="audio/wav")
         raise HTTPException(status_code=503, detail="Voice synthesis service currently unavailable")
 
-    return StreamingResponse(stream_gen, media_type="audio/mpeg")
+    audio_data = cached.get("data")
+    media_type = cached.get("media_type", "audio/wav")
+    if not audio_data:
+        raise HTTPException(status_code=404, detail="Audio data missing")
+
+    return Response(content=audio_data, media_type=media_type)
