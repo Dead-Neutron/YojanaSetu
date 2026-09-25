@@ -410,51 +410,14 @@ YojanaSetu-HackNex-Hackathon/
 
 | Creator | Role & Focus | GitHub Profile | LinkedIn Profile | Key Contributions |
 |---|---|---|---|---|
-| **[Creator 1 Full Name]** | [e.g., Lead AI Engineer] | [@username](https://github.com/) | [linkedin.com/in/username](https://linkedin.com/) | [e.g., Gemini Flash integration, multimodal prompt engineering, audio ingestion pipeline] |
-| **[Creator 2 Full Name]** | [e.g., Full Stack & Frontend Lead] | [@username](https://github.com/) | [linkedin.com/in/username](https://linkedin.com/) | [e.g., Next.js 15 Bento Grid architecture, Framer Motion interactions, i18n localization] |
-| **[Creator 3 Full Name]** | [e.g., Backend & Data Architect] | [@username](https://github.com/) | [linkedin.com/in/username](https://linkedin.com/) | [e.g., FastAPI modular backend, SQLAlchemy connection pooling, Kaggle ETL pipeline] |
-| **[Creator 4 Full Name]** | [e.g., Accessibility & Systems Engineer] | [@username](https://github.com/) | [linkedin.com/in/username](https://linkedin.com/) | [e.g., WCAG 2.2 AAA accessibility engine, ElevenLabs streaming TTS, Auth0 security] |
-
----
-
-## Detailed Creator Profiles
-
-### Creator 1: [Creator 1 Full Name]
-- **Role**: [Add Role Title, e.g., AI Research & Voice Architecture]
-- **Contact / Profiles**: [GitHub](https://github.com/) | [LinkedIn](https://linkedin.com/) | [Email](mailto:user@example.com)
-- **Primary Responsibilities**:
-  - Implemented multimodal audio processing pipeline using Gemini Flash.
-  - Designed structured demographic extraction schemas.
-  - Localized response synthesis and translation accuracy.
-
-### Creator 2: [Creator 2 Full Name]
-- **Role**: [Add Role Title, e.g., Frontend Architecture & UI/UX]
-- **Contact / Profiles**: [GitHub](https://github.com/) | [LinkedIn](https://linkedin.com/) | [Email](mailto:user@example.com)
-- **Primary Responsibilities**:
-  - Built responsive Bento Grid layout in Next.js 15.
-  - Implemented client-side MediaRecorder Web Audio API recorder with real-time visualizer.
-  - Developed full Trilingual localization context (English, Hindi, Bengali).
-
-### Creator 3: [Creator 3 Full Name]
-- **Role**: [Add Role Title, e.g., Backend Systems & Database Engineering]
-- **Contact / Profiles**: [GitHub](https://github.com/) | [LinkedIn](https://linkedin.com/) | [Email](mailto:user@example.com)
-- **Primary Responsibilities**:
-  - Engineered modular FastAPI ASGI application with SlowAPI rate limiting.
-  - Built Kaggle ETL pipeline ingesting and indexing 3,400 government schemes.
-  - Developed hybrid RAG search router supporting multi-parameter relational queries.
-
-### Creator 4: [Creator 4 Full Name]
-- **Role**: [Add Role Title, e.g., Accessibility, Security & Integration]
-- **Contact / Profiles**: [GitHub](https://github.com/) | [LinkedIn](https://linkedin.com/) | [Email](mailto:user@example.com)
-- **Primary Responsibilities**:
-  - Engineered WCAG 2.2 AAA Accessibility Engine (font scaling, OpenDyslexic mode, high contrast).
-  - Configured ElevenLabs multilingual streaming voice synthesis.
-  - Integrated Auth0 security verification and comprehensive API test suites.
+| **Rajdeep Saha** | Lead Architect, Backend, Python, Postgres DB | [@Dead-Neutron](https://github.com/Dead-Neutron) | [linkedin.com/in/Rajdeep Saha](https://www.linkedin.com/in/rajdeep-saha-0542433aa) | API integration, Prompt engineering, FastAPI bsckend |
+| **Pritam Saha** |RAG implementation, Vector Embedding, Chunking | [@pritam-12345](https://github.com/pritam-12345) | [linkedin.com/in/Pritam Saha](https://www.linkedin.com/in/pritam-saha-1449b7328) |  RAG Pipeline, Vector Embedding,Dataset Chunking |
+| **Mohima Ghosh** |  Backend & Data Architect | [@Mohimaghosh](https://github.com/Mohimaghosh/Mohimaghosh) | [linkedin.com/in/Mohima Ghosh](www.linkedin.com/in/mohima-ghosh-37a9a5340) |  Frontend, Ui-Ux Lead, Kaggle ETL pipeline |
+| **Premendu Manna** |  Accessibility & Frontend Lead | [@premendupingla-maker](https://github.com/premendupingla-maker) | [linkedin.com/in/Premendu Manna](https://www.linkedin.com/in/premendu-manna-1935b3362) |  WCAG 2.2 AAA accessibility, Next.js 15 Bento Grid architecture, Framer Motion interactions, i18n localization |
 
 ---
 
 ## License & Acknowledgments
-
 - **License**: Released under the [MIT License](LICENSE).
 - **Data Source**: Built upon the Indian Government Schemes dataset sourced from Kaggle and official public welfare portals.
 - **Hackathon**: Developed for **HackNex Hackathon**.
