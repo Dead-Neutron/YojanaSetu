@@ -86,6 +86,11 @@ def run_etl():
     updated_count = 0
 
     seen_slugs = set()
+    logger.info("Fetching existing scheme slugs from Tiger Data...")
+    existing_slugs = {s[0] for s in db.query(Scheme.slug).all() if s[0]}
+    logger.info(f"Found {len(existing_slugs)} existing schemes in database.")
+
+    batch_to_insert = []
 
     try:
         for idx, row in df.iterrows():
@@ -98,9 +103,12 @@ def run_etl():
                 slug = re.sub(r'[^a-zA-Z0-9]+', '-', name.lower()).strip('-')[:80]
             
             # Ensure unique slug even if dataset contains duplicates
-            if slug in seen_slugs:
+            if slug in seen_slugs or slug in existing_slugs:
                 slug = f"{slug}-{idx}"
             seen_slugs.add(slug)
+
+            if slug in existing_slugs:
+                continue
 
             details = str(row.get("details", "")) if pd.notna(row.get("details")) else ""
             benefits = str(row.get("benefits", "")) if pd.notna(row.get("benefits")) else ""
@@ -117,47 +125,36 @@ def run_etl():
             gender = extract_gender(all_text)
             occupation = extract_occupation(all_text)
 
-            # Check for existing record
-            existing = db.query(Scheme).filter(Scheme.slug == slug).first()
-            if existing:
-                existing.scheme_name = name
-                existing.details = details
-                existing.benefits = benefits
-                existing.eligibility = eligibility
-                existing.application = application
-                existing.documents = documents
-                existing.level = level
-                existing.state = state
-                existing.scheme_category = category
-                existing.tags = tags
-                existing.gender = gender
-                existing.occupation = occupation
-                updated_count += 1
-            else:
-                scheme = Scheme(
-                    scheme_name=name,
-                    slug=slug,
-                    details=details,
-                    benefits=benefits,
-                    eligibility=eligibility,
-                    application=application,
-                    documents=documents,
-                    level=level,
-                    state=state,
-                    scheme_category=category,
-                    tags=tags,
-                    gender=gender,
-                    occupation=occupation
-                )
-                db.add(scheme)
-                inserted_count += 1
+            scheme = Scheme(
+                scheme_name=name,
+                slug=slug,
+                details=details,
+                benefits=benefits,
+                eligibility=eligibility,
+                application=application,
+                documents=documents,
+                level=level,
+                state=state,
+                scheme_category=category,
+                tags=tags,
+                gender=gender,
+                occupation=occupation
+            )
+            batch_to_insert.append(scheme)
+            inserted_count += 1
 
-            if (idx + 1) % 250 == 0:
+            if len(batch_to_insert) >= 500:
+                db.add_all(batch_to_insert)
                 db.commit()
-                logger.info(f"Processed {idx + 1}/{len(df)} schemes...")
+                batch_to_insert.clear()
+                logger.info(f"Committed batch: {inserted_count}/{len(df)} schemes inserted so far...")
 
-        db.commit()
-        logger.info(f"ETL completed successfully: {inserted_count} inserted, {updated_count} updated.")
+        if batch_to_insert:
+            db.add_all(batch_to_insert)
+            db.commit()
+            batch_to_insert.clear()
+
+        logger.info(f"ETL completed successfully: {inserted_count} schemes inserted into Tiger Data.")
     except Exception as e:
         db.rollback()
         logger.error(f"ETL pipeline encountered error: {e}")

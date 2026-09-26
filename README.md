@@ -84,6 +84,12 @@ Across central and state administrations in India, more than 3,400 welfare initi
 ### 6. Trilingual Client Localization (i18n)
 - Native client-side context supporting instant, zero-reload switching between **English**, **Hindi (हिन्दी)**, and **Bengali (বাংলা)**.
 
+### 7. Personalized Citizen Recommendation Vault (`/recommendations`)
+- **Automated Availment Calculation**: Authenticated citizens with saved demographic profiles receive tailored scheme lists calculated across 3,400+ government programs.
+- **Relational Multi-Factor Eligibility Engine**: Matches location (State-specific and Central level), normalized occupation (e.g. Farmer, Artisan, Worker, Business, Student), gender exclusions, social category, and age eligibility.
+- **Smart Match Scoring & Reasoning**: Every scheme is tagged with an eligibility match percentage (65% to 99% Perfect Match) and bullet points detailing why the citizen qualifies.
+- **Protected Multi-State Guards**: Unauthenticated citizens are presented with a Civic Security Lock screen with one-click ID sign-in; citizens with incomplete profiles are guided with a 3-step onboarding progress tracker.
+
 ---
 
 ## Interface Preview & Visual Documentation
@@ -224,9 +230,12 @@ The FastAPI service exposes interactive Swagger documentation at `http://localho
 | `GET` | `/` | Service identification, version, and metadata |
 | `GET` | `/api/v1/health` | Comprehensive diagnostics (DB, Gemini, ElevenLabs, Auth0) |
 | `GET` | `/api/v1/schemes/search` | Multi-parameter scheme search with pagination and demographic filters |
+| `GET` | `/api/v1/schemes/recommendations` | **Personalized scheme recommendations** for authenticated citizens with saved demographic profiles |
 | `GET` | `/api/v1/schemes/categories` | List of all distinct scheme categories |
 | `GET` | `/api/v1/schemes/states` | List of all supported Indian states and union territories |
 | `GET` | `/api/v1/schemes/{id}` | Detailed scheme profile, benefits, eligibility, and documents |
+| `GET` | `/api/v1/auth/me` | Retrieve authenticated citizen profile and persistent demographics |
+| `POST` | `/api/v1/auth/profile` | Save or update citizen demographic criteria (State, Occupation, Gender, Caste, Age) |
 | `POST` | `/api/v1/voice-query` | Multimodal audio analysis, RAG retrieval, and localized synthesis |
 | `GET` | `/api/v1/voice-query/audio/{id}` | Streaming audio playback for synthesized responses |
 

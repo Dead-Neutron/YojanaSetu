@@ -350,6 +350,22 @@ export default function Navbar() {
                   {t("nav.searchSchemes")}
                 </span>
               </Link>
+              <Link
+                href="/recommendations"
+                className={`group px-4 py-2 rounded-xl font-bold text-sm flex items-center gap-1.5 transition-all ${
+                  pathname === "/recommendations"
+                    ? "bg-[#F59E0B] text-[#171717] shadow-sm"
+                    : "text-slate-200 hover:bg-[#23487A] hover:text-white"
+                }`}
+              >
+                <Sparkles className={`w-4 h-4 ${pathname === "/recommendations" ? "text-[#171717]" : "text-[#F59E0B]"}`} />
+                <span className="inline-block transition-transform duration-200 group-hover:scale-105">
+                  {t("nav.recommendations")}
+                </span>
+                {isAuthenticated && user?.demographics?.state && (
+                  <span className="w-2 h-2 rounded-full bg-[#059669] animate-pulse ml-0.5" title="Personalized Recommendations Available"></span>
+                )}
+              </Link>
               <a
                 href="#about"
                 className="group px-4 py-2 rounded-xl font-semibold text-sm text-slate-200 hover:bg-[#23487A] hover:text-white transition-all"
@@ -439,6 +455,25 @@ export default function Navbar() {
               <span className="inline-block transition-transform duration-200 group-hover:scale-105">
                 {t("nav.searchSchemes")}
               </span>
+            </Link>
+            <Link
+              href="/recommendations"
+              onClick={() => setMobileMenuOpen(false)}
+              className={`group flex items-center justify-between px-4 py-3 rounded-xl font-bold text-base ${
+                pathname === "/recommendations" ? "bg-[#F59E0B] text-[#171717]" : "text-white bg-[#1A365D]"
+              }`}
+            >
+              <div className="flex items-center gap-2">
+                <Sparkles className="w-5 h-5 text-[#F59E0B]" />
+                <span className="inline-block transition-transform duration-200 group-hover:scale-105">
+                  {t("nav.recommendations")}
+                </span>
+              </div>
+              {isAuthenticated && user?.demographics?.state && (
+                <span className="text-[10px] bg-[#059669] text-white px-2 py-0.5 rounded-full font-bold">
+                  Eligible
+                </span>
+              )}
             </Link>
             {isAuthenticated ? (
               <button
