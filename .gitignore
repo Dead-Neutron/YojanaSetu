@@ -1,7 +1,8 @@
-# Virtual Environment & Agent Config
+# Virtual Environment, Agent Config & UI/UX Pro Max Skill
 .venv/
 venv/
 .agents/
+.agent/
 
 # Local Sensitive / Large Data
 PLAN.md

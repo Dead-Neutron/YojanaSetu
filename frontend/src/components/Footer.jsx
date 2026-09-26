@@ -1,56 +1,56 @@
 import Link from "next/link";
-import { Phone, CheckCircle2 } from "lucide-react";
+import { Phone, CheckCircle2, ShieldCheck } from "lucide-react";
 import { useLanguage } from "@/i18n/LanguageContext";
 
 export default function Footer() {
   const { t } = useLanguage();
 
   return (
-    <footer className="bg-[#122844] text-slate-300 border-t border-[#23487A] mt-auto">
-      {/* Helplines Strip in Deep Saturated Indigo */}
-      <div className="bg-[#1A365D] border-b border-[#23487A] py-8 px-4 sm:px-6 lg:px-8">
+    <footer className="bg-slate-950/80 text-slate-300 border-t border-white/[0.08] backdrop-blur-xl mt-auto">
+      {/* Helplines Strip in Frosted Obsidian */}
+      <div className="bg-slate-900/60 border-b border-white/[0.08] py-8 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 text-sm">
-          <div className="flex items-start gap-3.5 bg-[#122844] p-4 rounded-xl border border-[#23487A]">
-            <div className="p-2.5 bg-[#F59E0B]/20 text-[#F59E0B] rounded-lg shrink-0">
+          <div className="flex items-start gap-3.5 bg-slate-800/50 p-4 rounded-2xl border border-white/[0.06] backdrop-blur-md">
+            <div className="p-2.5 bg-amber-500/20 text-amber-400 rounded-xl shrink-0">
               <Phone className="w-5 h-5" />
             </div>
             <div>
-              <div className="text-white font-bold">{t("footer.nationalHelpline")}</div>
-              <div className="text-[#F59E0B] font-extrabold text-base tracking-wide">1800-11-2001</div>
-              <div className="text-xs text-slate-300 mt-0.5">{t("nav.tollFree")}, 24x7</div>
+              <div className="text-slate-100 font-bold">{t("footer.nationalHelpline") || "National Citizen Helpline"}</div>
+              <div className="text-amber-400 font-extrabold text-base tracking-wide">1800-11-2001</div>
+              <div className="text-xs text-slate-400 mt-0.5">{t("nav.tollFree") || "Toll-Free"}, 24x7</div>
             </div>
           </div>
 
-          <div className="flex items-start gap-3.5 bg-[#122844] p-4 rounded-xl border border-[#23487A]">
-            <div className="p-2.5 bg-[#00A3C4]/20 text-[#00A3C4] rounded-lg shrink-0">
+          <div className="flex items-start gap-3.5 bg-slate-800/50 p-4 rounded-2xl border border-white/[0.06] backdrop-blur-md">
+            <div className="p-2.5 bg-emerald-500/20 text-emerald-400 rounded-xl shrink-0">
               <Phone className="w-5 h-5" />
             </div>
             <div>
-              <div className="text-white font-bold">{t("footer.kisanHelpline")}</div>
-              <div className="text-[#00A3C4] font-extrabold text-base tracking-wide">155261</div>
-              <div className="text-xs text-slate-300 mt-0.5">{t("nav.tollFree")}</div>
+              <div className="text-slate-100 font-bold">{t("footer.kisanHelpline") || "Kisan Support Call Center"}</div>
+              <div className="text-emerald-400 font-extrabold text-base tracking-wide">155261</div>
+              <div className="text-xs text-slate-400 mt-0.5">{t("nav.tollFree") || "Toll-Free"}</div>
             </div>
           </div>
 
-          <div className="flex items-start gap-3.5 bg-[#122844] p-4 rounded-xl border border-[#23487A]">
-            <div className="p-2.5 bg-[#F59E0B]/20 text-[#F59E0B] rounded-lg shrink-0">
+          <div className="flex items-start gap-3.5 bg-slate-800/50 p-4 rounded-2xl border border-white/[0.06] backdrop-blur-md">
+            <div className="p-2.5 bg-amber-500/20 text-amber-400 rounded-xl shrink-0">
               <Phone className="w-5 h-5" />
             </div>
             <div>
-              <div className="text-white font-bold">{t("footer.healthHelpline")}</div>
-              <div className="text-[#F59E0B] font-extrabold text-base tracking-wide">14555</div>
-              <div className="text-xs text-slate-300 mt-0.5">{t("nav.tollFree")}</div>
+              <div className="text-slate-100 font-bold">{t("footer.healthHelpline") || "Ayushman Health Desk"}</div>
+              <div className="text-amber-400 font-extrabold text-base tracking-wide">14555</div>
+              <div className="text-xs text-slate-400 mt-0.5">{t("nav.tollFree") || "Toll-Free"}</div>
             </div>
           </div>
 
-          <div className="flex items-start gap-3.5 bg-[#122844] p-4 rounded-xl border border-[#23487A]">
-            <div className="p-2.5 bg-[#00A3C4]/20 text-[#00A3C4] rounded-lg shrink-0">
+          <div className="flex items-start gap-3.5 bg-slate-800/50 p-4 rounded-2xl border border-white/[0.06] backdrop-blur-md">
+            <div className="p-2.5 bg-cyan-500/20 text-cyan-400 rounded-xl shrink-0">
               <Phone className="w-5 h-5" />
             </div>
             <div>
-              <div className="text-white font-bold">{t("footer.womenHelpline")}</div>
-              <div className="text-[#00A3C4] font-extrabold text-base tracking-wide">181 / 1098</div>
-              <div className="text-xs text-slate-300 mt-0.5">{t("nav.tollFree")}</div>
+              <div className="text-slate-100 font-bold">{t("footer.womenHelpline") || "Women & Child Care"}</div>
+              <div className="text-cyan-400 font-extrabold text-base tracking-wide">181 / 1098</div>
+              <div className="text-xs text-slate-400 mt-0.5">{t("nav.tollFree") || "Toll-Free"}</div>
             </div>
           </div>
         </div>
@@ -62,91 +62,99 @@ export default function Footer() {
           {/* Platform Info */}
           <div className="space-y-4">
             <div className="flex items-center gap-2.5">
-              <span className="text-xl font-black text-white tracking-tight">{t("nav.title")}</span>
+              <span className="text-xl font-extrabold text-slate-50 tracking-tight">{t("nav.title") || "YojanaSetu"}</span>
             </div>
-            <p className="text-sm text-slate-300 leading-relaxed">
-              {t("footer.platformDesc")}
+            <p className="text-sm text-slate-300 leading-relaxed font-normal">
+              {t("footer.platformDesc") ||
+                "A national civic empowerment platform dismantling literacy and digital barriers through vernacular voice AI and direct welfare entitlement discovery."}
             </p>
-            <div className="flex items-center gap-2 text-xs text-[#00A3C4] font-semibold">
+            <div className="flex items-center gap-2 text-xs text-emerald-400 font-semibold">
               <CheckCircle2 className="w-4 h-4" />
-              <span>{t("footer.wcag")}</span>
+              <span>{t("footer.wcag") || "WCAG 2.2 AAA Verified Access"}</span>
             </div>
           </div>
 
           {/* Quick Links */}
           <div className="space-y-3">
-            <h4 className="text-white font-bold text-xs uppercase tracking-wider border-b border-[#23487A] pb-1.5">
-              {t("footer.features")}
+            <h4 className="text-slate-100 font-bold text-xs uppercase tracking-wider border-b border-white/[0.08] pb-1.5">
+              {t("footer.features") || "Platform Portals"}
             </h4>
             <ul className="space-y-2.5 text-sm">
               <li>
-                <Link href="/" className="hover:text-white transition-colors">
-                  {t("nav.voiceAssistant")}
+                <Link href="/" className="hover:text-amber-400 transition-colors">
+                  {t("nav.voiceAssistant") || "Voice Assistant"}
                 </Link>
               </li>
               <li>
-                <Link href="/search" className="hover:text-white transition-colors">
-                  {t("nav.searchSchemes")}
+                <Link href="/search" className="hover:text-amber-400 transition-colors">
+                  {t("nav.searchSchemes") || "Scheme Directory"}
                 </Link>
               </li>
               <li>
-                <a href="#categories" className="hover:text-white transition-colors">
-                  {t("categories.agriculture")}
-                </a>
+                <Link href="/recommendations" className="hover:text-amber-400 transition-colors">
+                  Personalized Eligibility
+                </Link>
               </li>
               <li>
-                <a href="#categories" className="hover:text-white transition-colors">
-                  {t("categories.women")}
-                </a>
+                <Link href="/about" className="hover:text-amber-400 transition-colors font-medium">
+                  {t("nav.about") || "About Platform & Architecture"}
+                </Link>
               </li>
               <li>
-                <a href="#categories" className="hover:text-white transition-colors">
-                  {t("categories.education")}
-                </a>
+                <Link href="/search?category=Agriculture" className="hover:text-amber-400 transition-colors">
+                  {t("categories.agriculture") || "Agriculture Subsidies"}
+                </Link>
+              </li>
+              <li>
+                <Link href="/search?category=Women%20and%20Child" className="hover:text-amber-400 transition-colors">
+                  {t("categories.women") || "Women & Child Care"}
+                </Link>
               </li>
             </ul>
           </div>
 
           {/* Regional Audio Access */}
           <div className="space-y-3">
-            <h4 className="text-white font-bold text-xs uppercase tracking-wider border-b border-[#23487A] pb-1.5">
-              {t("footer.regionalAccess")}
+            <h4 className="text-slate-100 font-bold text-xs uppercase tracking-wider border-b border-white/[0.08] pb-1.5">
+              {t("footer.regionalAccess") || "Multilingual Synthesis"}
             </h4>
-            <p className="text-xs text-slate-300 leading-relaxed">
-              {t("footer.regionalDesc")}
+            <p className="text-xs text-slate-300 leading-relaxed font-normal">
+              {t("footer.regionalDesc") ||
+                "Listen to schemes spoken naturally in your native dialect with read-along text synchronization."}
             </p>
             <div className="flex flex-wrap gap-2 text-xs font-semibold text-slate-200">
-              <span className="bg-[#1A365D] px-3 py-1 rounded-full border border-[#23487A]">English</span>
-              <span className="bg-[#1A365D] px-3 py-1 rounded-full border border-[#23487A]">हिन्दी (Hindi)</span>
-              <span className="bg-[#1A365D] px-3 py-1 rounded-full border border-[#23487A]">বাংলা (Bengali)</span>
+              <span className="bg-slate-800/80 px-3 py-1 rounded-full border border-white/[0.08]">English</span>
+              <span className="bg-slate-800/80 px-3 py-1 rounded-full border border-white/[0.08]">हिन्दी (Hindi)</span>
+              <span className="bg-slate-800/80 px-3 py-1 rounded-full border border-white/[0.08]">বাংলা (Bengali)</span>
             </div>
           </div>
 
           {/* Informatics Disclaimer */}
           <div className="space-y-3">
-            <h4 className="text-white font-bold text-xs uppercase tracking-wider border-b border-[#23487A] pb-1.5">
-              {t("footer.integrity")}
+            <h4 className="text-slate-100 font-bold text-xs uppercase tracking-wider border-b border-white/[0.08] pb-1.5">
+              {t("footer.integrity") || "Data Sovereignty"}
             </h4>
-            <p className="text-xs text-slate-300 leading-relaxed">
-              {t("footer.integrityDesc")}
+            <p className="text-xs text-slate-300 leading-relaxed font-normal">
+              {t("footer.integrityDesc") ||
+                "All schemes reference authentic .gov.in official government gazettes with zero middleman interference."}
             </p>
             <div className="text-[11px] text-slate-400 pt-2">
-              All schemes reference authentic <code className="text-[#F59E0B] font-bold">.gov.in</code> official resources.
+              Source verified against official <code className="text-amber-400 font-bold">.gov.in</code> &amp; <code className="text-amber-400 font-bold">.nic.in</code> gazettes.
             </div>
           </div>
         </div>
 
         {/* Bottom Strip */}
-        <div className="mt-10 pt-6 border-t border-[#23487A] flex flex-col sm:flex-row items-center justify-between text-xs text-slate-400">
+        <div className="mt-10 pt-6 border-t border-white/[0.08] flex flex-col sm:flex-row items-center justify-between text-xs text-slate-400">
           <div>
-            © 2026 {t("footer.copyright")}
+            © 2026 {t("footer.copyright") || "YojanaSetu • Ministry & Civic Open Technology Initiative"}
           </div>
-          <div className="flex items-center gap-4 mt-2 sm:mt-0">
+          <div className="flex items-center gap-4 mt-2 sm:mt-0 font-medium">
             <span>WCAG AAA Accessible</span>
             <span>•</span>
             <span>Zero Data Profiling</span>
             <span>•</span>
-            <span>Open Civic Technology</span>
+            <span>Direct Benefit Transfer</span>
           </div>
         </div>
       </div>

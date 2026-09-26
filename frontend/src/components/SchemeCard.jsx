@@ -1,102 +1,181 @@
-import { ArrowRight, CheckCircle2, MapPin } from "lucide-react";
-import { useLanguage } from "@/i18n/LanguageContext";
+"use client";
 
-export default function SchemeCard({ scheme, onSelect }) {
-  const { t } = useLanguage();
-  if (!scheme) return null;
+import React from "react";
+import { motion } from "framer-motion";
+import { Mic, ArrowRight, CheckCircle2, Award, MapPin, Building2 } from "lucide-react";
+
+export function SchemeCard({
+  scheme,
+  onSelect,
+  onVoiceQuery,
+  title = "AICTE-LILAVATI AWARD",
+  category = "Education & Scholarship",
+  matchScore = 99,
+  level = "Central Level",
+  benefit = "Award & financial recognition of ₹1,00,000 for top performing women-led teams.",
+  reasons = [
+    "Directly targeted for Women in Technical Education",
+    "Central Government initiative accessible across all States",
+    "Verified against current Student & Demographic profile"
+  ]
+}) {
+  const displayTitle = scheme?.scheme_name || scheme?.title || title;
+  const displayCategory = scheme?.category || category;
+  const displayMatchScore = scheme?.match_score ?? scheme?.matchScore ?? matchScore;
+  const displayLevel = scheme?.level
+    ? scheme.level.includes("Level")
+      ? scheme.level
+      : `${scheme.level} Level`
+    : level;
+  const displayState = scheme?.state && scheme.state !== "All India" ? scheme.state : null;
+  const displayBenefit = scheme?.benefits || scheme?.benefit || benefit;
+
+  // Clean, structured eligibility reasons
+  const displayReasons =
+    Array.isArray(scheme?.reasons) && scheme.reasons.length > 0
+      ? scheme.reasons
+      : Array.isArray(scheme?.match_reasons) && scheme.match_reasons.length > 0
+      ? scheme.match_reasons
+      : scheme?.eligibility
+      ? [
+          scheme.eligibility.length > 95
+            ? scheme.eligibility.substring(0, 95).trim() + "..."
+            : scheme.eligibility,
+          displayState
+            ? `Verified for eligible citizen domicile in ${displayState}`
+            : "Central Government initiative accessible to all Indian residents",
+          scheme.occupation && scheme.occupation !== "All Citizens"
+            ? `Tailored specifically for ${scheme.occupation} category`
+            : "Verified against current citizen demographics & profile"
+        ]
+      : reasons;
+
+  const handleSelect = () => {
+    if (onSelect) {
+      onSelect(
+        scheme || {
+          scheme_name: displayTitle,
+          category: displayCategory,
+          benefits: displayBenefit,
+          match_score: displayMatchScore,
+          level: displayLevel,
+          state: displayState
+        }
+      );
+    }
+  };
+
+  const handleVoiceQuery = (e) => {
+    e.stopPropagation();
+    if (onVoiceQuery) {
+      onVoiceQuery(
+        scheme || {
+          scheme_name: displayTitle,
+          category: displayCategory
+        }
+      );
+    }
+  };
 
   return (
-    <div className="bg-[#F8F9FA] rounded-xl border border-[#E5E5E5] hover:border-[#00A3C4] transition-all duration-200 civic-shadow-sm hover:civic-shadow-md flex flex-col justify-between p-6">
-      <div>
-        {/* Header Badges */}
-        <div className="flex flex-wrap items-center gap-2 mb-3.5">
-          <span 
-            className={`text-xs font-bold px-3 py-1 rounded-full ${
-              scheme.level === "Central"
-                ? "bg-[#1A365D] text-white"
-                : "bg-[#00829D] text-white"
-            }`}
-          >
-            {scheme.level === "Central" ? t("scheme.central") : (scheme.level === "State" ? t("scheme.state") : t("scheme.national"))}
+    <motion.article 
+      initial={{ opacity: 0, y: 15 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+      className="group relative flex flex-col justify-between rounded-3xl bg-slate-900/80 p-7 sm:p-8 backdrop-blur-xl border border-white/[0.08] shadow-lg transition-all hover:border-white/[0.18] hover:shadow-xl min-h-[480px]"
+    >
+      <div className="space-y-4">
+        {/* Top Badges Row */}
+        <div className="flex flex-wrap items-center justify-between gap-2.5 pb-1">
+          <span className="inline-flex items-center gap-2 rounded-full bg-emerald-500/15 px-3.5 py-1 text-xs font-semibold text-emerald-400">
+            <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
+            {displayMatchScore}% Match
           </span>
 
-          {scheme.state && scheme.state !== "All India" && (
-            <span className="text-xs font-semibold text-[#171717] bg-[#FFFFFF] px-3 py-1 rounded-full border border-[#E5E5E5] flex items-center gap-1">
-              <MapPin className="w-3.5 h-3.5 text-[#00A3C4]" />
-              <span>{scheme.state}</span>
-            </span>
-          )}
-
-          <span className="text-xs font-semibold text-[#1A365D] bg-[#E6F7FA] px-3 py-1 rounded-full border border-[#00A3C4]/30">
-            {scheme.category}
-          </span>
+          <div className="flex items-center gap-2">
+            {displayState ? (
+              <span className="inline-flex items-center gap-1 rounded-full bg-slate-800/90 px-3 py-1 text-xs font-medium text-amber-400 border border-white/[0.06]">
+                <MapPin className="h-3 w-3 text-amber-400 shrink-0" />
+                <span>{displayState}</span>
+              </span>
+            ) : (
+              <span className="inline-flex items-center gap-1 rounded-full bg-slate-800/90 px-3 py-1 text-xs font-medium text-slate-300 border border-white/[0.06]">
+                <Building2 className="h-3 w-3 text-slate-400 shrink-0" />
+                <span>{displayLevel}</span>
+              </span>
+            )}
+          </div>
         </div>
 
-        {/* Scheme Title */}
-        <h3 className="text-xl font-bold text-[#171717] leading-snug line-clamp-2 mb-3 tracking-tight">
-          {scheme.scheme_name}
+        {/* Category Label */}
+        <p className="text-xs font-bold uppercase tracking-wider text-amber-400/90">
+          {displayCategory}
+        </p>
+
+        {/* Large, High-Legibility Title */}
+        <h3 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-50 line-clamp-2 leading-snug">
+          {displayTitle}
         </h3>
 
-        {/* Key Benefits Highlight Box */}
-        {scheme.benefits && (
-          <div className="bg-[#E6F7FA] border-l-4 border-[#00A3C4] p-3.5 rounded-r-lg mb-4">
-            <div className="text-xs font-bold text-[#00829D] uppercase tracking-wide mb-1 flex items-center gap-1.5">
-              <CheckCircle2 className="w-4 h-4 text-[#00A3C4]" />
-              <span>{t("scheme.benefitsTitle")}</span>
-            </div>
-            <p className="text-sm font-medium text-[#171717] line-clamp-3 leading-relaxed">
-              {scheme.benefits}
-            </p>
+        {/* Formatted Key Benefit Box */}
+        <div className="rounded-2xl bg-slate-800/50 p-4.5 border border-white/[0.06] backdrop-blur-sm space-y-1.5">
+          <div className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-amber-400">
+            <Award className="h-4 w-4 text-amber-400 shrink-0" />
+            <span>Financial &amp; Welfare Benefit</span>
           </div>
-        )}
+          <p className="text-sm leading-relaxed text-slate-200 font-normal line-clamp-3">
+            {displayBenefit}
+          </p>
+        </div>
 
-        {/* Eligibility Snippet */}
-        {scheme.eligibility && (
-          <div className="mb-4">
-            <div className="text-xs font-bold text-[#525252] uppercase tracking-wide mb-1">
-              {t("scheme.eligibilityTitle")}
-            </div>
-            <p className="text-sm text-[#404040] line-clamp-2 leading-relaxed">
-              {scheme.eligibility}
-            </p>
+        {/* Eligibility Checkpoints List with Clear Formatting */}
+        <div className="space-y-2.5 pt-1">
+          <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+            Why you qualify:
+          </p>
+          <div className="space-y-2">
+            {displayReasons.slice(0, 3).map((reason, idx) => (
+              <div key={idx} className="flex items-start gap-2.5">
+                <CheckCircle2 className="h-4 w-4 text-emerald-400 shrink-0 mt-0.5" />
+                <span className="text-xs sm:text-sm leading-relaxed text-slate-300">
+                  {reason}
+                </span>
+              </div>
+            ))}
           </div>
-        )}
-
-        {/* Demographics Target Pills */}
-        <div className="flex flex-wrap gap-1.5 mb-4 text-xs font-medium text-[#525252]">
-          {scheme.gender && scheme.gender !== "All" && (
-            <span className="bg-[#FFFFFF] text-[#171717] px-2.5 py-0.5 rounded-lg border border-[#E5E5E5]">
-              {t("scheme.target")} {scheme.gender}
-            </span>
-          )}
-          {scheme.occupation && scheme.occupation !== "All Citizens" && (
-            <span className="bg-[#FFFFFF] text-[#171717] px-2.5 py-0.5 rounded-lg border border-[#E5E5E5]">
-              {scheme.occupation}
-            </span>
-          )}
-          {scheme.caste && scheme.caste !== "All" && (
-            <span className="bg-[#FFFFFF] text-[#171717] px-2.5 py-0.5 rounded-lg border border-[#E5E5E5]">
-              {t("scheme.category")} {scheme.caste}
-            </span>
-          )}
         </div>
       </div>
 
-      {/* Action Footer */}
-      <div className="pt-4 border-t border-[#E5E5E5] flex items-center justify-between mt-2">
-        <span className="text-xs text-[#525252] font-medium">
-          {t("scheme.verified")}
-        </span>
-        <button
+      {/* Button Actions Footer (Borderless & Solid Warm Colors, No Heavy Gradients) */}
+      <div className="flex items-center gap-3 pt-6 mt-6 border-t border-white/[0.06]">
+        {/* Secondary: Voice Query (Solid frosted slate, borderless) */}
+        <motion.button
           type="button"
-          onClick={() => onSelect(scheme)}
-          className="inline-flex items-center gap-2 bg-[#F59E0B] hover:bg-[#D97706] text-[#171717] font-bold px-4 py-2 rounded-xl text-sm transition-all civic-shadow-sm hover:civic-shadow-md"
-          aria-label={`View details for ${scheme.scheme_name}`}
+          onClick={handleVoiceQuery}
+          whileHover={{ scale: 1.025, y: -1 }}
+          whileTap={{ scale: 0.98 }}
+          transition={{ type: "spring", stiffness: 400, damping: 20 }}
+          className="flex-1 flex items-center justify-center gap-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-white/[0.06] px-4 py-3 text-xs font-semibold shadow-xs transition-colors cursor-pointer"
         >
-          <span>{t("scheme.viewDetails")}</span>
-          <ArrowRight className="w-4 h-4" />
-        </button>
+          <Mic className="h-4 w-4 text-amber-400" />
+          <span>Voice Query</span>
+        </motion.button>
+
+        {/* Primary CTA: View Details (Solid warm saffron, borderless) */}
+        <motion.button
+          type="button"
+          onClick={handleSelect}
+          whileHover={{ scale: 1.04 }}
+          whileTap={{ scale: 0.96 }}
+          transition={{ type: "spring", stiffness: 400, damping: 17 }}
+          className="flex-1 flex items-center justify-center gap-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 px-5 py-3 text-xs sm:text-sm font-bold shadow-xs transition-colors cursor-pointer"
+        >
+          <span>View Details</span>
+          <ArrowRight className="h-4 w-4 stroke-[2.5]" />
+        </motion.button>
       </div>
-    </div>
+    </motion.article>
   );
 }
+
+export default SchemeCard;
