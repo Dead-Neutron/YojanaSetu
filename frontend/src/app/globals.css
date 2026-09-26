@@ -1,93 +1,106 @@
+@import url('https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,600;0,6..72,700;1,6..72,400&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
 @import "tailwindcss";
 
 /* ==============================================================================
-   THE MODERN CIVIC DESIGN SYSTEM
+   YOJANA SETU BESPOKE CIVIC-TECH DESIGN SYSTEM
    Palette & Architecture:
-   - Primary Brand: Deep Saturated Indigo (#1A365D)
-   - Supporting Accent: Electric Cyan (#00A3C4)
-   - Call to Action: Saffron Heritage (#F59E0B)
-   - Base Text: Deep Charcoal Ink (#171717)
-   - Surfaces: Alabaster Glow (#F8F9FA)
-   - Global Canvas: Pure White (#FFFFFF)
-   - Subtle Dividers: Soft Gray (#E5E5E5)
-   - 60-30-10 Rule: 60% White space, 30% Structural Indigo, 10% Saffron Heritage
+   - Base Canvas: Deep Obsidian Slate (#070d17 to #0f172a)
+   - Light Mode Palette (Calm Humanist):
+     #8B9A6E (Calm Sage Olive)
+     #F7F2EB (Warm Linen / Ivory Paper)
+     #EAE2D6 (Warm Oat / Sandstone)
+     #EEEEEE (Soft Neutral Stone)
    ============================================================================== */
 
 @theme {
+  --color-canvas-obsidian: #070d17;
+  --color-canvas-slate: #0f172a;
+  --color-surface-panel: rgba(15, 23, 42, 0.75);
+  --color-surface-card: rgba(15, 23, 42, 0.85);
+  --color-border-hairline: rgba(255, 255, 255, 0.08);
+  --color-border-hairline-hover: rgba(255, 255, 255, 0.16);
+
   --color-brand-indigo: #1A365D;
   --color-brand-indigo-dark: #122844;
   --color-brand-indigo-subtle: #23487A;
+
   --color-accent-cyan: #00A3C4;
   --color-accent-cyan-light: #E6F7FA;
   --color-accent-cyan-dark: #00829D;
+
   --color-cta-saffron: #F59E0B;
   --color-cta-saffron-hover: #D97706;
   --color-cta-saffron-light: #FEF3C7;
-  --color-text-charcoal: #171717;
-  --color-text-secondary: #404040;
-  --color-text-muted: #525252;
-  --color-surface-alabaster: #F8F9FA;
-  --color-canvas-white: #FFFFFF;
-  --color-border-soft: #E5E5E5;
+
+  --color-text-heading: #F8FAFC;
+  --color-text-body: #CBD5E1;
+  --color-text-muted: #94A3B8;
+
+  --color-match-emerald: #34D399;
+  --color-match-emerald-bg: rgba(16, 185, 129, 0.15);
 }
 
 :root {
-  --color-brand-indigo: #1A365D;
-  --color-brand-indigo-dark: #122844;
-  --color-brand-indigo-subtle: #23487A;
-  --color-accent-cyan: #00A3C4;
-  --color-accent-cyan-light: #E6F7FA;
-  --color-accent-cyan-dark: #00829D;
-  --color-cta-saffron: #F59E0B;
-  --color-cta-saffron-hover: #D97706;
-  --color-cta-saffron-light: #FEF3C7;
-  --color-text-charcoal: #171717;
-  --color-text-secondary: #404040;
-  --color-text-muted: #525252;
-  --color-surface-alabaster: #F8F9FA;
-  --color-canvas-white: #FFFFFF;
-  --color-border-soft: #E5E5E5;
+  --canvas-obsidian: #070d17;
+  --canvas-slate: #0f172a;
+  --surface-panel: rgba(15, 23, 42, 0.75);
+  --text-heading: #F8FAFC;
+  --text-body: #CBD5E1;
+  --text-muted: #94A3B8;
 }
 
 body {
-  background-color: var(--color-canvas-white);
-  color: var(--color-text-charcoal);
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+  background-color: #070d17;
+  background-image: 
+    radial-gradient(ellipse 85% 55% at 50% -15%, rgba(37, 99, 235, 0.08), transparent 70%),
+    radial-gradient(ellipse 60% 45% at 100% 50%, rgba(245, 158, 11, 0.04), transparent 60%),
+    radial-gradient(ellipse 55% 50% at 0% 90%, rgba(37, 99, 235, 0.06), transparent 60%);
+  background-attachment: fixed;
+  color: #CBD5E1;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-feature-settings: 'tnum' on, 'cv05' on;
   margin: 0;
   padding: 0;
   -webkit-font-smoothing: antialiased;
 }
 
-/* Subtle Modern Glassmorphism */
+/* Civic Obsidian Glassmorphism */
+.glass-obsidian {
+  background-color: rgba(15, 23, 42, 0.75);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
 .glass-nav {
-  background-color: rgba(26, 54, 93, 0.94);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  background-color: rgba(7, 13, 23, 0.88);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
 }
 
-.glass-card {
-  background-color: rgba(255, 255, 255, 0.88);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+/* Borderless Button Rules: Never render borders on interactive button surfaces */
+button, 
+[role="button"] {
+  border-style: none !important;
 }
 
-/* Modern Subtle Soft Elevation */
-.civic-shadow-sm {
-  box-shadow: 0 1px 3px rgba(26, 54, 93, 0.05), 0 1px 2px rgba(0, 0, 0, 0.03);
+/* Ambient Glow Utilities for Depth */
+.glow-saffron {
+  box-shadow: 0 10px 25px -5px rgba(245, 158, 11, 0.45);
 }
 
-.civic-shadow-md {
-  box-shadow: 0 4px 12px -2px rgba(26, 54, 93, 0.07), 0 2px 4px -1px rgba(0, 0, 0, 0.04);
+.glow-saffron-hover:hover {
+  box-shadow: 0 12px 28px -3px rgba(245, 158, 11, 0.6);
 }
 
-.civic-shadow-lg {
-  box-shadow: 0 10px 25px -3px rgba(26, 54, 93, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+.glow-cyan {
+  box-shadow: 0 8px 24px -4px rgba(0, 163, 196, 0.35);
 }
 
-/* Accessibility Focus Ring (WCAG AA & AAA Compliance) */
+/* Accessibility Focus Ring (WCAG AAA Compliance) */
 *:focus-visible {
-  outline: 3px solid #00A3C4;
-  outline-offset: 2px;
+  outline: 2px solid #F59E0B;
+  outline-offset: 3px;
   border-radius: 8px;
 }
 
@@ -122,10 +135,10 @@ html.high-contrast body {
   color: #FFFFFF !important;
 }
 
-html.high-contrast .bg-white,
-html.high-contrast .bg-slate-50,
-html.high-contrast .bg-slate-100 {
-  background-color: #0B0F19 !important;
+html.high-contrast .bg-slate-900\/75,
+html.high-contrast .bg-slate-800\/80,
+html.high-contrast .bg-slate-800\/50 {
+  background-color: #05080F !important;
   border-color: #FFFFFF !important;
   color: #FFFFFF !important;
 }
@@ -146,11 +159,11 @@ html.high-contrast .bg-slate-100 {
   animation: civic-mic-pulse 2.2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
-/* Dynamic Equalizer in Electric Cyan and Marigold */
+/* Dynamic Voice Waveform Equalizer in Electric Cyan and Marigold */
 @keyframes civic-wave-eq {
-  0% { height: 10px; }
-  50% { height: 42px; }
-  100% { height: 16px; }
+  0% { height: 8px; }
+  50% { height: 38px; }
+  100% { height: 14px; }
 }
 
 .animate-civic-eq-1 { animation: civic-wave-eq 0.85s ease-in-out infinite alternate; }
@@ -161,5 +174,241 @@ html.high-contrast .bg-slate-100 {
 .animate-civic-eq-6 { animation: civic-wave-eq 0.70s ease-in-out infinite 0.25s alternate; }
 .animate-civic-eq-7 { animation: civic-wave-eq 0.90s ease-in-out infinite 0.35s alternate; }
 
+/* ==============================================================================
+   LIGHT MODE: SERENE & CALM HUMANIST CIVIC PALETTE (WCAG AAA)
+   Palette Architecture:
+   - Primary Accent: #8B9A6E (Calm Sage / Olive)
+   - Canvas / Body: #F7F2EB (Warm Linen / Ivory Paper)
+   - Cards & Elevated Panels: #EAE2D6 (Warm Oat / Sandstone)
+   - Neutral Chips & Soft Borders: #EEEEEE (Soft Stone)
+   - Primary Text: #242A1D (Deep Forest Espresso Charcoal, 11:1+ contrast)
+   - Secondary Text: #45503B (Soft Olive Slate, 6:1+ contrast)
+   - Muted Text: #66735A (Comfortable metadata)
+   - Hairline Paper Borders: #DDD6C9 & #EEEEEE
+   ============================================================================== */
 
- 
+html.light-mode {
+  color-scheme: light;
+}
+
+html.light-mode body {
+  background-color: #F7F2EB !important;
+  background-image: none !important;
+  color: #242A1D !important;
+  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+}
+
+/* Headings in Light Mode: Dignified, human editorial typography */
+html.light-mode h1,
+html.light-mode h2,
+html.light-mode h3 {
+  font-family: 'Newsreader', Georgia, Cambria, 'Times New Roman', serif !important;
+  color: #242A1D !important;
+  letter-spacing: -0.015em !important;
+}
+
+/* In light mode, turn off decorative background ambient glow orbs without affecting any components */
+html.light-mode div.pointer-events-none.rounded-full[class*="blur-"] {
+  display: none !important;
+}
+
+html.light-mode .backdrop-blur-xl,
+html.light-mode .backdrop-blur-2xl,
+html.light-mode .backdrop-blur-md,
+html.light-mode .backdrop-blur-sm,
+html.light-mode .glass-obsidian,
+html.light-mode .glass-nav {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* Base Canvas & Main Page Backgrounds */
+html.light-mode .bg-\[\#070d17\],
+html.light-mode .bg-slate-950,
+html.light-mode .bg-slate-950\/80,
+html.light-mode .bg-slate-950\/90 {
+  background-color: #F7F2EB !important;
+}
+
+/* Sticky Header Container & Top Pre-Nav Utility Bar */
+html.light-mode .bg-slate-950\/95 {
+  background-color: #EAE2D6 !important;
+  border-bottom-color: #DDD6C9 !important;
+}
+
+/* Cards, Modal Dialogs & Major Elevated Surfaces: #EAE2D6 */
+html.light-mode .bg-slate-900,
+html.light-mode .bg-slate-900\/60,
+html.light-mode .bg-slate-900\/75,
+html.light-mode .bg-slate-900\/80,
+html.light-mode .bg-slate-900\/90,
+html.light-mode .bg-slate-900\/95,
+html.light-mode .bg-slate-900\/98,
+html.light-mode .bg-slate-850,
+html.light-mode .bg-\[\#1A365D\] {
+  background-color: #EAE2D6 !important;
+  border-color: #DDD6C9 !important;
+}
+
+/* Neutral Chips, Secondary Buttons, Inputs, Inner Containers: #EEEEEE */
+html.light-mode .bg-slate-800,
+html.light-mode .bg-slate-800\/50,
+html.light-mode .bg-slate-800\/60,
+html.light-mode .bg-slate-800\/70,
+html.light-mode .bg-slate-800\/80,
+html.light-mode .bg-slate-800\/90,
+html.light-mode .bg-\[\#122844\],
+html.light-mode .bg-slate-700,
+html.light-mode .bg-slate-700\/80 {
+  background-color: #EEEEEE !important;
+  color: #242A1D !important;
+  border-color: #DDD6C9 !important;
+}
+
+html.light-mode .hover\:bg-slate-800:hover,
+html.light-mode .hover\:bg-slate-700:hover {
+  background-color: #E2DACD !important;
+  color: #242A1D !important;
+}
+
+/* Primary Accent & Action Buttons: Sage Green #8B9A6E */
+html.light-mode .bg-amber-500 {
+  background-color: #8B9A6E !important;
+  color: #FFFFFF !important;
+}
+
+html.light-mode .bg-amber-500,
+html.light-mode .bg-amber-500 span,
+html.light-mode .bg-amber-500 * {
+  color: #FFFFFF !important;
+}
+
+html.light-mode .hover\:bg-amber-400:hover,
+html.light-mode .hover\:bg-amber-500:hover,
+html.light-mode .hover\:bg-amber-600:hover {
+  background-color: #79885D !important;
+  color: #FFFFFF !important;
+}
+
+/* Footer & Section Containers in Light Mode */
+html.light-mode footer {
+  background-color: #EAE2D6 !important;
+  border-top-color: #DDD6C9 !important;
+}
+
+html.light-mode footer .bg-slate-900\/60 {
+  background-color: #E4DBD0 !important;
+  border-bottom-color: #DDD6C9 !important;
+}
+
+html.light-mode footer .bg-slate-800\/50 {
+  background-color: #EEEEEE !important;
+  border-color: #DDD6C9 !important;
+}
+
+html.light-mode .text-amber-400,
+html.light-mode .text-amber-500 {
+  color: #55663B !important;
+}
+
+html.light-mode .bg-amber-500\/10,
+html.light-mode .bg-amber-500\/15,
+html.light-mode .bg-amber-500\/20 {
+  background-color: rgba(139, 154, 110, 0.18) !important;
+  color: #384527 !important;
+}
+
+html.light-mode .border-amber-500\/20,
+html.light-mode .border-amber-500\/30,
+html.light-mode .border-amber-500\/40,
+html.light-mode .border-amber-400 {
+  border-color: #8B9A6E !important;
+}
+
+/* Category & Status Badges in Light Mode */
+html.light-mode .bg-emerald-500\/15,
+html.light-mode .bg-emerald-500\/20 {
+  background-color: rgba(139, 154, 110, 0.22) !important;
+}
+
+html.light-mode .text-emerald-400 {
+  color: #435230 !important;
+}
+
+html.light-mode .text-cyan-400 {
+  color: #4A635D !important;
+}
+
+/* High-Contrast, Eye-Friendly Typography */
+html.light-mode .text-white,
+html.light-mode .text-slate-50,
+html.light-mode .text-slate-100 {
+  color: #242A1D !important;
+}
+
+html.light-mode .text-slate-200,
+html.light-mode .text-slate-300 {
+  color: #45503B !important;
+}
+
+html.light-mode .text-slate-400,
+html.light-mode .text-slate-500 {
+  color: #66735A !important;
+}
+
+/* Natural Paper Hairline Borders: #DDD6C9 */
+html.light-mode .border-white\/\[0\.06\],
+html.light-mode .border-white\/\[0\.08\],
+html.light-mode .border-white\/\[0\.1\],
+html.light-mode .border-white\/\[0\.12\],
+html.light-mode .border-white\/\[0\.16\],
+html.light-mode .border-white\/\[0\.18\],
+html.light-mode .border-\[\#23487A\] {
+  border-color: #DDD6C9 !important;
+}
+
+/* Clean, tactile inputs & select controls in light mode */
+html.light-mode input,
+html.light-mode select,
+html.light-mode textarea {
+  background-color: #FFFFFF !important;
+  color: #242A1D !important;
+  border-color: #DDD6C9 !important;
+}
+
+html.light-mode option {
+  background-color: #FFFFFF !important;
+  color: #242A1D !important;
+}
+
+html.light-mode input::placeholder,
+html.light-mode textarea::placeholder {
+  color: #7B8770 !important;
+}
+
+/* Replace glowing neon drop shadows with soft, physical paper elevation */
+html.light-mode .shadow-xl,
+html.light-mode .shadow-2xl,
+html.light-mode [class*="shadow-\[0_20px_"],
+html.light-mode [class*="shadow-\[0_24px_"],
+html.light-mode [class*="shadow-\[0_25px_"],
+html.light-mode [class*="shadow-\[0_8px_"],
+html.light-mode [class*="shadow-\[0_4px_"] {
+  box-shadow: 0 1px 3px rgba(44, 51, 37, 0.05), 0 8px 24px -4px rgba(44, 51, 37, 0.07) !important;
+}
+
+/* Subtle dot texture in light mode */
+html.light-mode [class*="radial-gradient(#ffffff"] {
+  opacity: 0.02 !important;
+}
+
+/* Voice Equalizer bars in Sage #8B9A6E */
+html.light-mode [class*="animate-civic-eq-"] {
+  background-color: #8B9A6E !important;
+}
+
+/* Accessible selection style in light mode */
+html.light-mode ::selection {
+  background-color: rgba(139, 154, 110, 0.3) !important;
+  color: #242A1D !important;
+}

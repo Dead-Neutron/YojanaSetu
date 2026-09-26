@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { motion, AnimatePresence } from "framer-motion";
 import { X, User, LogOut, CheckCircle2, Save, Sliders, Shield, Sparkles, ArrowRight } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 
@@ -62,29 +63,35 @@ export default function CitizenProfileModal({ isOpen, onClose }) {
 
   return (
     <div
-      className="fixed inset-0 bg-slate-950/75 z-50 flex items-center justify-center p-4 backdrop-blur-xs animate-in fade-in duration-200"
+      className="fixed inset-0 bg-slate-950/80 z-[90] flex items-center justify-center p-4 backdrop-blur-md"
       role="dialog"
       aria-modal="true"
       aria-labelledby="citizen-profile-title"
     >
-      <div className="bg-[#1A365D] border border-[#23487A] rounded-2xl max-w-lg w-full text-white shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95, y: 15 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.95, y: 15 }}
+        transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+        className="bg-slate-900/95 border border-white/[0.12] rounded-3xl max-w-lg w-full text-slate-100 shadow-[0_25px_60px_rgba(0,0,0,0.6)] overflow-hidden flex flex-col max-h-[90vh] backdrop-blur-2xl"
+      >
         {/* Modal Header */}
-        <div className="bg-[#122844] p-6 border-b border-[#23487A] flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-xl bg-[#F59E0B] text-[#171717] font-black text-lg flex items-center justify-center shadow-sm">
+        <div className="bg-slate-850 p-6 border-b border-white/[0.08] flex items-center justify-between">
+          <div className="flex items-center gap-3.5">
+            <div className="w-12 h-12 rounded-2xl bg-amber-500 text-slate-950 font-black text-lg flex items-center justify-center shadow-xs">
               {user.name ? user.name.charAt(0).toUpperCase() : "C"}
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h2 id="citizen-profile-title" className="text-lg font-black text-white">
+                <h2 id="citizen-profile-title" className="text-xl font-extrabold text-slate-50 tracking-tight">
                   {user.name}
                 </h2>
-                <span className="inline-flex items-center gap-1 bg-[#059669]/20 text-[#34D399] border border-[#059669]/40 text-[10px] px-2 py-0.5 rounded-full font-bold">
+                <span className="inline-flex items-center gap-1 bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 text-[10px] px-2 py-0.5 rounded-full font-bold">
                   <Shield className="w-3 h-3" />
                   Verified Citizen
                 </span>
               </div>
-              <span className="text-xs text-slate-300 font-medium">
+              <span className="text-xs text-amber-400/90 font-medium">
                 {user.email || user.sub}
               </span>
             </div>
@@ -92,7 +99,7 @@ export default function CitizenProfileModal({ isOpen, onClose }) {
           <button
             type="button"
             onClick={onClose}
-            className="text-slate-300 hover:text-white p-2 rounded-xl hover:bg-[#23487A] transition-colors cursor-pointer"
+            className="text-slate-400 hover:text-white p-2 rounded-xl hover:bg-white/10 transition-colors cursor-pointer"
             aria-label="Close modal"
           >
             <X className="w-5 h-5" />
@@ -101,28 +108,28 @@ export default function CitizenProfileModal({ isOpen, onClose }) {
 
         {/* Modal Body */}
         <form onSubmit={handleSave} className="p-6 overflow-y-auto space-y-5">
-          <div className="bg-[#0B1E36] border border-[#23487A] rounded-xl p-3.5 flex items-start gap-2.5">
-            <Sliders className="w-4 h-4 text-[#00A3C4] shrink-0 mt-0.5" />
-            <p className="text-xs text-slate-300 leading-relaxed">
-              Your demographic profile is securely saved in the database. It pre-filters welfare schemes in the search portal and tunes the voice assistant for personalized eligibility matching.
+          <div className="bg-slate-800/50 border border-white/[0.06] rounded-2xl p-4 flex items-start gap-3">
+            <Sliders className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+            <p className="text-xs text-slate-300 leading-relaxed font-normal">
+              Your demographic profile securely persists in the national database to pre-filter welfare schemes in the search portal and provide precise AI recommendations.
             </p>
           </div>
 
           <div className="space-y-4">
             {/* State Selection */}
             <div>
-              <label htmlFor="profile-state" className="block text-xs font-bold text-slate-300 uppercase mb-1">
+              <label htmlFor="profile-state" className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
                 State of Residence
               </label>
               <select
                 id="profile-state"
                 value={state}
                 onChange={(e) => setState(e.target.value)}
-                className="w-full p-2.5 bg-[#122844] border border-[#23487A] rounded-xl text-sm font-semibold text-white focus:border-[#00A3C4] focus:outline-none"
+                className="w-full p-3 bg-slate-800/80 border border-white/[0.1] rounded-xl text-sm font-medium text-slate-100 focus:border-amber-400 focus:outline-none cursor-pointer"
               >
-                <option value="">-- Select State of Residence --</option>
+                <option value="" className="bg-slate-900 text-slate-300">-- Select State of Residence --</option>
                 {INDIAN_STATES.map((st) => (
-                  <option key={st} value={st}>
+                  <option key={st} value={st} className="bg-slate-900 text-slate-100">
                     {st}
                   </option>
                 ))}
@@ -131,18 +138,18 @@ export default function CitizenProfileModal({ isOpen, onClose }) {
 
             {/* Occupation Selection */}
             <div>
-              <label htmlFor="profile-occupation" className="block text-xs font-bold text-slate-300 uppercase mb-1">
+              <label htmlFor="profile-occupation" className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
                 Primary Occupation
               </label>
               <select
                 id="profile-occupation"
                 value={occupation}
                 onChange={(e) => setOccupation(e.target.value)}
-                className="w-full p-2.5 bg-[#122844] border border-[#23487A] rounded-xl text-sm font-semibold text-white focus:border-[#00A3C4] focus:outline-none"
+                className="w-full p-3 bg-slate-800/80 border border-white/[0.1] rounded-xl text-sm font-medium text-slate-100 focus:border-amber-400 focus:outline-none cursor-pointer"
               >
-                <option value="">-- Select Primary Occupation --</option>
+                <option value="" className="bg-slate-900 text-slate-300">-- Select Primary Occupation --</option>
                 {OCCUPATIONS.map((occ) => (
-                  <option key={occ} value={occ}>
+                  <option key={occ} value={occ} className="bg-slate-900 text-slate-100">
                     {occ}
                   </option>
                 ))}
@@ -152,18 +159,18 @@ export default function CitizenProfileModal({ isOpen, onClose }) {
             {/* Gender & Age row */}
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label htmlFor="profile-gender" className="block text-xs font-bold text-slate-300 uppercase mb-1">
+                <label htmlFor="profile-gender" className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
                   Gender
                 </label>
                 <select
                   id="profile-gender"
                   value={gender}
                   onChange={(e) => setGender(e.target.value)}
-                  className="w-full p-2.5 bg-[#122844] border border-[#23487A] rounded-xl text-sm font-semibold text-white focus:border-[#00A3C4] focus:outline-none"
+                  className="w-full p-3 bg-slate-800/80 border border-white/[0.1] rounded-xl text-sm font-medium text-slate-100 focus:border-amber-400 focus:outline-none cursor-pointer"
                 >
-                  <option value="">-- Select Gender --</option>
+                  <option value="" className="bg-slate-900 text-slate-300">-- Select Gender --</option>
                   {GENDERS.map((g) => (
-                    <option key={g} value={g}>
+                    <option key={g} value={g} className="bg-slate-900 text-slate-100">
                       {g}
                     </option>
                   ))}
@@ -171,7 +178,7 @@ export default function CitizenProfileModal({ isOpen, onClose }) {
               </div>
 
               <div>
-                <label htmlFor="profile-age" className="block text-xs font-bold text-slate-300 uppercase mb-1">
+                <label htmlFor="profile-age" className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
                   Age
                 </label>
                 <input
@@ -182,25 +189,25 @@ export default function CitizenProfileModal({ isOpen, onClose }) {
                   placeholder="e.g. 35"
                   value={age}
                   onChange={(e) => setAge(e.target.value)}
-                  className="w-full p-2.5 bg-[#122844] border border-[#23487A] rounded-xl text-sm font-semibold text-white focus:border-[#00A3C4] focus:outline-none placeholder-slate-500"
+                  className="w-full p-3 bg-slate-800/80 border border-white/[0.1] rounded-xl text-sm font-medium text-slate-100 focus:border-amber-400 focus:outline-none placeholder-slate-400"
                 />
               </div>
             </div>
 
             {/* Social / Caste Category */}
             <div>
-              <label htmlFor="profile-caste" className="block text-xs font-bold text-slate-300 uppercase mb-1">
+              <label htmlFor="profile-caste" className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
                 Social / Caste Category
               </label>
               <select
                 id="profile-caste"
                 value={caste}
                 onChange={(e) => setCaste(e.target.value)}
-                className="w-full p-2.5 bg-[#122844] border border-[#23487A] rounded-xl text-sm font-semibold text-white focus:border-[#00A3C4] focus:outline-none"
+                className="w-full p-3 bg-slate-800/80 border border-white/[0.1] rounded-xl text-sm font-medium text-slate-100 focus:border-amber-400 focus:outline-none cursor-pointer"
               >
-                <option value="">-- Select Category / Caste --</option>
+                <option value="" className="bg-slate-900 text-slate-300">-- Select Category / Caste --</option>
                 {CASTES.map((c) => (
-                  <option key={c} value={c}>
+                  <option key={c} value={c} className="bg-slate-900 text-slate-100">
                     {c}
                   </option>
                 ))}
@@ -210,9 +217,9 @@ export default function CitizenProfileModal({ isOpen, onClose }) {
 
           {/* Quick Recommendations Navigation Callout */}
           {(state || user?.demographics?.state) && (
-            <div className="bg-[#0B1E36] border border-[#00A3C4]/30 rounded-xl p-3 flex items-center justify-between">
+            <div className="bg-slate-800/60 border border-amber-500/25 rounded-2xl p-4 flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Sparkles className="w-4 h-4 text-[#F59E0B]" />
+                <Sparkles className="w-4 h-4 text-amber-400" />
                 <span className="text-xs font-semibold text-slate-200">
                   Ready to see your eligible welfare schemes?
                 </span>
@@ -223,7 +230,7 @@ export default function CitizenProfileModal({ isOpen, onClose }) {
                   onClose();
                   router.push("/recommendations");
                 }}
-                className="text-xs text-[#F59E0B] hover:text-white font-bold flex items-center gap-1 cursor-pointer transition-colors"
+                className="text-xs text-amber-400 hover:text-amber-300 font-bold flex items-center gap-1 cursor-pointer transition-colors"
               >
                 <span>View Schemes</span>
                 <ArrowRight className="w-3.5 h-3.5" />
@@ -231,7 +238,7 @@ export default function CitizenProfileModal({ isOpen, onClose }) {
             </div>
           )}
 
-          {/* Action Buttons */}
+          {/* Action Buttons (Solid Fills, Borderless, No Multi-Stop Gradients) */}
           <div className="pt-2 flex items-center justify-between gap-3">
             <button
               type="button"
@@ -247,23 +254,23 @@ export default function CitizenProfileModal({ isOpen, onClose }) {
 
             <button
               type="submit"
-              className="bg-[#F59E0B] hover:bg-[#D97706] text-[#171717] px-5 py-2.5 rounded-xl text-xs font-black flex items-center gap-2 transition-all shadow-sm active:scale-95 cursor-pointer"
+              className="bg-amber-500 hover:bg-amber-400 text-slate-950 px-5 py-2.5 rounded-xl text-xs font-bold flex items-center gap-2 transition-all shadow-sm active:scale-95 cursor-pointer"
             >
               {isSaved ? (
                 <>
-                  <CheckCircle2 className="w-4 h-4 text-[#171717]" />
-                  <span>Preferences Saved to Database!</span>
+                  <CheckCircle2 className="w-4 h-4 text-slate-950 stroke-[2.5]" />
+                  <span>Preferences Saved!</span>
                 </>
               ) : (
                 <>
-                  <Save className="w-4 h-4" />
+                  <Save className="w-4 h-4 stroke-[2.5]" />
                   <span>Save Demographic Profile</span>
                 </>
               )}
             </button>
           </div>
         </form>
-      </div>
+      </motion.div>
     </div>
   );
 }
