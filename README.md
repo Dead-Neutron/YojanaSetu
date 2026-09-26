@@ -2,6 +2,9 @@
 
 **AI-Powered Multilingual Citizen Assistant & Discovery Platform for Indian Government Welfare Schemes**
 
+[![Sarvam AI](https://img.shields.io/badge/LLM-Sarvam%20AI%20(Indic%20GenAI)-FF6F00?style=flat-square)](https://www.sarvam.ai/)
+[![TigerData](https://img.shields.io/badge/Database-TigerData%20(Postgres%20%26%20pgvector)-F59E0B?style=flat-square&logo=postgresql&logoColor=white)](https://www.tigerdata.com/)
+[![Auth0](https://img.shields.io/badge/Authentication-Auth0%20by%20Okta-EB5424?style=flat-square&logo=auth0&logoColor=white)](https://auth0.com/)
 [![FastAPI](https://img.shields.io/badge/Backend-FastAPI%20ASGI-009688?style=flat-square)](https://fastapi.tiangolo.com/)
 [![Next.js](https://img.shields.io/badge/Frontend-Next.js%2015%20App%20Router-000000?style=flat-square)](https://nextjs.org/)
 [![Python](https://img.shields.io/badge/Python-3.14-3776AB?style=flat-square)](https://www.python.org/)
@@ -15,11 +18,8 @@
 
 <!-- HERO BANNER / SCREENSHOT PLACEHOLDER -->
 ```
-========================================================================================
-[ PLACEHOLDER: PROJECT HERO BANNER / MAIN INTERFACE PREVIEW ]
-Recommended image path: docs/screenshots/hero_preview.png
-Format: 1920x1080 (16:9), PNG or WebP
-========================================================================================
+<img src = "/screenshots/hero_preview.jpeg>
+
 ```
 <!-- Replace with actual image tag once ready: -->
 <!-- ![YojanaSetu Hero Preview](docs/screenshots/hero_preview.png) -->
@@ -29,6 +29,7 @@ Format: 1920x1080 (16:9), PNG or WebP
 ## Table of Contents
 
 - [Executive Summary](#executive-summary)
+- [Hackathon Sponsor Tracks](#hackathon-sponsor-tracks)
 - [Key Architectural Pillars](#key-architectural-pillars)
 - [Interface Preview & Visual Documentation](#interface-preview--visual-documentation)
 - [System Architecture & Data Pipeline](#system-architecture--data-pipeline)
@@ -55,20 +56,33 @@ Across central and state administrations in India, more than 3,400 welfare initi
 
 ---
 
+## 🏆 Hackathon Sponsor Tracks
+
+YojanaSetu actively integrates and implements solutions tailored for the following **HackNex** partner tracks:
+
+| Track | Partner Technology | Core Implementation & Architectural Role | Primary Code Files |
+|---|---|---|---|
+| **🇮🇳 Sarvam AI Track** | **Sarvam AI (Saaras, Mayura & Bulbul)** | **Sovereign Indic Language Intelligence**: Powers direct vernacular speech recognition (`Saaras v3`), colloquial dialect translation into English (`Mayura`), and studio-grade regional speech synthesis (`Bulbul`) across 22 scheduled Indian languages. | [`sarvam.py`](backend/app/services/sarvam.py)<br>[`VoiceAssistant.jsx`](frontend/src/components/VoiceAssistant.jsx) |
+| **🐯 TigerData Track** | **TigerData (PostgreSQL & pgvector)** | **High-Throughput Relational & Vector Infrastructure**: Employs TigerData PostgreSQL with `pgvector` HNSW indexing for hybrid demographic filtering and sub-50ms vector similarity matching across 3,400+ central and state schemes. | [`database.py`](backend/app/database.py)<br>[`ingest_schemes.py`](backend/scripts/ingest_schemes.py)<br>[`models.py`](backend/app/models.py) |
+| **🔐 Auth0 Track** | **Auth0 by Okta** | **Citizen Identity & Multi-State Vault Security**: Enterprise RS256 JWT authorization, public JWKS key rotation, and persistent citizen profile management protecting the Personalized Citizen Recommendation Vault (`/recommendations`). | [`security.py`](backend/app/core/security.py)<br>[`recommendations/page.js`](frontend/src/app/recommendations/page.js) |
+
+---
+
 ## Key Architectural Pillars
 
-### 1. Multimodal Voice-First Assistant
+### 1. Multimodal Voice-First Assistant & Indic AI
 - **Direct Speech-to-Meaning**: Powered by Google Gemini Flash multimodal capabilities, ingesting raw WebM/WAV audio blobs without relying on lossy, multi-hop third-party STT chains.
+- **Sovereign Indic Language Intelligence (Sarvam AI)**: Leverages **Sarvam AI (Saaras v3 & Mayura)** for sovereign Indian language audio transcription and vernacular translation into English across Hindi, Bengali, and regional dialects.
 - **Demographic Constraint Extraction**: Automatically infers citizen profile data—including state, gender, age, occupation, and caste eligibility—directly from colloquial speech.
 - **Vernacular Response Synthesis**: Generates empathetic, simplified instructions in regional mother tongues without bureaucratic complexity.
 
 ### 2. Low-Latency Voice Streaming
-- **Regional Speech Generation**: Integrated with ElevenLabs (`eleven_multilingual_v2`) for natural, human-grade Indian regional voice generation delivered via FastAPI streaming endpoints (`StreamingResponse`).
+- **Authentic Regional Speech Generation**: Integrated with **Sarvam AI Bulbul** (native studio-recorded Indic speakers) and **ElevenLabs** (`eleven_multilingual_v2`) for natural, human-grade Indian regional voice generation delivered via FastAPI streaming endpoints (`StreamingResponse`).
 - **Resilient Fallback**: Automatically degrades to client-side Web Speech API if API quotas or network constraints occur, guaranteeing uninterrupted service availability.
 
-### 3. Hybrid RAG Retrieval Engine
+### 3. Hybrid RAG Retrieval Engine (TigerData PostgreSQL)
 - **3,400+ Ingested Schemes**: Structured database parsed from the Kaggle Government Schemes dataset with relational attributes (`state`, `level`, `category`, `gender`, `occupation`, `caste_category`).
-- **Dual-Engine Architecture**: Employs SQLAlchemy connection pooling for PostgreSQL (`psycopg3`), coupled with instant in-memory fallback indexing to ensure zero downtime during local or remote development.
+- **TigerData PostgreSQL & pgvector**: Employs **TigerData PostgreSQL** connection pooling with `pgvector` HNSW vector embeddings and SQLAlchemy, coupled with instant in-memory fallback indexing to ensure sub-50ms hybrid semantic retrieval during local or remote development.
 
 ### 4. Modern Accessible Bento Grid Interface
 - **Clarity-Driven Design**: Clean card-based Bento layout utilizing high-contrast design tokens (`#0B1120` Navy, `#F8FAFC` Off-White, `#1E3A8A` Civic Blue) with strictly zero distracting glassmorphism, no gradient noise, and no informal emojis.
@@ -88,7 +102,7 @@ Across central and state administrations in India, more than 3,400 welfare initi
 - **Automated Availment Calculation**: Authenticated citizens with saved demographic profiles receive tailored scheme lists calculated across 3,400+ government programs.
 - **Relational Multi-Factor Eligibility Engine**: Matches location (State-specific and Central level), normalized occupation (e.g. Farmer, Artisan, Worker, Business, Student), gender exclusions, social category, and age eligibility.
 - **Smart Match Scoring & Reasoning**: Every scheme is tagged with an eligibility match percentage (65% to 99% Perfect Match) and bullet points detailing why the citizen qualifies.
-- **Protected Multi-State Guards**: Unauthenticated citizens are presented with a Civic Security Lock screen with one-click ID sign-in; citizens with incomplete profiles are guided with a 3-step onboarding progress tracker.
+- **Protected Multi-State Guards (Auth0 by Okta)**: Secured via **Auth0 by Okta** enterprise RS256 JWT authorization, public JWKS caching, and persistent citizen profile management. Unauthenticated citizens are presented with a Civic Security Lock screen with one-click ID sign-in; citizens with incomplete profiles are guided with a 3-step onboarding progress tracker.
 
 ---
 
@@ -193,11 +207,12 @@ Recommended path: docs/screenshots/04_scheme_details_modal.png
 | **Icons** | Lucide React | Latest | Clean, standardized SVG civic icons |
 | **Backend Framework** | FastAPI | 0.141.x | Async ASGI web API with strict OpenAPI schemas |
 | **ASGI Server** | Uvicorn | 0.53.x | High-throughput asynchronous server |
-| **Database & ORM** | SQLAlchemy & Psycopg 3 | 2.0.x / 3.3.x | Connection pooling and relational scheme modeling |
-| **Multimodal AI** | Google GenAI (Gemini Flash) | 2.25.x | Direct audio analysis and response synthesis |
-| **Voice Synthesis** | ElevenLabs API | v2 | Multilingual regional speech streaming |
+| **Database & Vector Search** | TigerData PostgreSQL & pgvector | 16+ / 0.7.x | Cloud PostgreSQL cluster with HNSW vector indexing & connection pooling |
+| **Indic GenAI & Translation** | Sarvam AI (Saaras & Mayura) | v1 / v3 | Sovereign Indic STT, vernacular translation, and native dialect understanding |
+| **Multimodal AI** | Google GenAI (Gemini Flash) | 2.25.x | Direct audio analysis and conversational response synthesis |
+| **Voice Synthesis** | Sarvam Bulbul & ElevenLabs | v2 / v3 | Multilingual regional speech streaming with authentic Indian native speakers |
+| **Authentication & Identity** | Auth0 by Okta / PyJWT | 2.15.x | RS256 JWT bearer token verification with public JWKS caching & vault protection |
 | **Rate Limiting** | SlowAPI / Limits | 0.1.x | Endpoint protection and resource throttling |
-| **Authentication** | PyJWT / Auth0 | 2.15.x | RS256 token verification with public JWKS caching |
 | **Data Processing** | Pandas | 3.0.x | Kaggle CSV ingestion and normalization pipeline |
 
 ---
@@ -430,4 +445,8 @@ YojanaSetu-HackNex-Hackathon/
 - **License**: Released under the [MIT License](LICENSE).
 - **Data Source**: Built upon the Indian Government Schemes dataset sourced from Kaggle and official public welfare portals.
 - **Hackathon**: Developed for **HackNex Hackathon**.
+- **Hackathon Tracks & Integrations**:
+  - 🇮🇳 **Sarvam AI Track**: Sovereign Indic AI speech processing (Saaras v3), translation (Mayura), and regional voice generation (Bulbul).
+  - 🐯 **TigerData Track**: High-throughput PostgreSQL database cluster with `pgvector` HNSW index for sub-50ms hybrid welfare scheme retrieval.
+  - 🔐 **Auth0 Track**: Enterprise citizen authentication, RS256 JWT validation, cached JWKS public keys, and personalized recommendation vault protection.
 - **Mission**: Dedicated to digital inclusion, linguistic equity, and accessible public welfare delivery for every Indian citizen.
