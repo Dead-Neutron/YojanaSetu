@@ -23,7 +23,9 @@ import {
   AlignJustify,
   Eye,
   Sparkles,
-  Info
+  Info,
+  Sun,
+  Moon
 } from "lucide-react";
 
 export default function Navbar() {
@@ -39,6 +41,9 @@ export default function Navbar() {
     setDyslexicFont,
     highContrast,
     setHighContrast,
+    theme,
+    setTheme,
+    toggleTheme,
     resetAccessibility,
   } = useAccessibility();
 
@@ -178,6 +183,45 @@ export default function Navbar() {
                     </button>
                   </div>
 
+                  {/* Theme Mode Segment */}
+                  <div className="bg-slate-800/60 border border-white/[0.06] p-2.5 rounded-xl space-y-2">
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="font-semibold text-slate-200 flex items-center gap-1.5">
+                        {theme === "light" ? <Sun className="w-3.5 h-3.5 text-amber-500" /> : <Moon className="w-3.5 h-3.5 text-cyan-400" />}
+                        <span>Theme (रंग स्वरूप)</span>
+                      </span>
+                      <span className="text-[10px] text-slate-400 font-medium">
+                        {theme === "light" ? "Linen & Sage" : "Obsidian Night"}
+                      </span>
+                    </div>
+                    <div className="grid grid-cols-2 gap-1.5">
+                      <button
+                        type="button"
+                        onClick={() => setTheme("dark")}
+                        className={`py-1.5 px-2 rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
+                          theme === "dark"
+                            ? "bg-slate-700 text-white font-bold shadow-xs"
+                            : "bg-slate-800/80 hover:bg-slate-700/80 text-slate-300"
+                        }`}
+                      >
+                        <Moon className="w-3 h-3" />
+                        <span>Dark</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setTheme("light")}
+                        className={`py-1.5 px-2 rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
+                          theme === "light"
+                            ? "bg-amber-500 text-white font-bold shadow-xs"
+                            : "bg-slate-800/80 hover:bg-slate-700/80 text-slate-300"
+                        }`}
+                      >
+                        <Sun className="w-3 h-3 text-amber-200" />
+                        <span>Light</span>
+                      </button>
+                    </div>
+                  </div>
+
                   {/* Text Size Scaling */}
                   <div className="space-y-2">
                     <div className="flex items-center justify-between text-xs">
@@ -297,23 +341,42 @@ export default function Navbar() {
                     </button>
                   </div>
 
-                  {/* Reset Button */}
-                  <div className="pt-1">
-                    <button
-                      type="button"
-                      onClick={resetAccessibility}
-                      className="w-full flex items-center justify-center gap-1.5 py-2 rounded-xl text-xs font-semibold text-slate-300 bg-slate-800 hover:bg-slate-700 hover:text-white transition-colors cursor-pointer"
-                    >
-                      <RotateCcw className="w-3.5 h-3.5" />
-                      <span>Reset to Default</span>
-                    </button>
-                  </div>
-                </div>
-              )}
+              {/* Reset Button */}
+              <div className="pt-1">
+                <button
+                  type="button"
+                  onClick={resetAccessibility}
+                  className="w-full flex items-center justify-center gap-1.5 py-2 rounded-xl text-xs font-semibold text-slate-300 bg-slate-800 hover:bg-slate-700 hover:text-white transition-colors cursor-pointer"
+                >
+                  <RotateCcw className="w-3.5 h-3.5" />
+                  <span>Reset to Default</span>
+                </button>
+              </div>
             </div>
-          </div>
+          )}
         </div>
+
+        {/* Small Divider between Accessibility and Theme Switcher */}
+        <div className="h-4 w-px bg-white/[0.18] mx-0.5" aria-hidden="true" />
+
+        {/* Quick Top Bar Theme Icon Button (Kept only in Accessibility Bar) */}
+        <button
+          type="button"
+          onClick={toggleTheme}
+          className="flex items-center justify-center p-1.5 px-2 rounded-xl text-xs font-semibold bg-slate-900/90 hover:bg-slate-800 text-slate-200 hover:text-white border border-white/[0.08] backdrop-blur-md transition-all cursor-pointer shadow-xs group"
+          aria-label={theme === "light" ? "Switch to Dark Mode" : "Switch to Light Mode"}
+          title={theme === "light" ? "Switch to Dark Mode (Obsidian)" : "Switch to Light Mode (Linen & Sage)"}
+          id="accessibility-theme-toggle-btn"
+        >
+          {theme === "light" ? (
+            <Moon className="w-3.5 h-3.5 text-slate-800" />
+          ) : (
+            <Sun className="w-3.5 h-3.5 text-amber-400 group-hover:rotate-45 transition-transform" />
+          )}
+        </button>
       </div>
+    </div>
+  </div>
 
       {/* =========================================================================
           MAIN CIVIC NAVBAR (OBSIDIAN FROSTED GLASS) - z-40 (LOWER THAN ACCESSIBILITY BAR z-[55])
@@ -421,7 +484,7 @@ export default function Navbar() {
               )}
             </div>
 
-            {/* Mobile Menu Trigger */}
+            {/* Mobile Header Menu Trigger */}
             <div className="md:hidden flex items-center gap-2">
               <button
                 type="button"
@@ -485,6 +548,7 @@ export default function Navbar() {
               <Info className="w-5 h-5 text-amber-400" />
               <span>{t("nav.about") || "About Platform"}</span>
             </Link>
+
             {isAuthenticated ? (
               <button
                 type="button"

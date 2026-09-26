@@ -8,7 +8,9 @@ import {
   Type, 
   AlignJustify, 
   Eye, 
-  Sparkles
+  Sparkles,
+  Sun,
+  Moon
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -22,6 +24,9 @@ export default function AccessibilityDrawer() {
     setDyslexicFont,
     highContrast,
     setHighContrast,
+    theme,
+    setTheme,
+    toggleTheme,
     isDrawerOpen,
     setIsDrawerOpen,
     resetAccessibility,
@@ -83,6 +88,57 @@ export default function AccessibilityDrawer() {
                 >
                   <X className="w-5 h-5" />
                 </button>
+              </div>
+
+              {/* Control 0: Theme Mode (Dark Mode vs Light Mode - Linen & Sage) */}
+              <div className="bg-slate-800/60 border border-white/[0.06] p-4 rounded-2xl space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="text-sm font-bold text-slate-100 flex items-center gap-2">
+                    {theme === "light" ? (
+                      <Sun className="w-4 h-4 text-amber-500" />
+                    ) : (
+                      <Moon className="w-4 h-4 text-cyan-400" />
+                    )}
+                    <span>Visual Theme (रंग स्वरूप)</span>
+                  </div>
+                  <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full border border-white/[0.08] text-slate-300">
+                    {theme === "light" ? "Linen & Sage (सुलभ शांत)" : "Obsidian Night"}
+                  </span>
+                </div>
+
+                <p className="text-xs text-slate-300">
+                  {theme === "light"
+                    ? "Warm ivory paper canvas with calm sage accents (#8B9A6E). Gentle on the eyes, anti-fatigue."
+                    : "Crisp dark mode with deep obsidian slate surfaces."}
+                </p>
+
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setTheme("dark")}
+                    className={`py-2.5 px-3 rounded-xl border text-xs font-semibold flex items-center justify-center gap-2 transition-all cursor-pointer ${
+                      theme === "dark"
+                        ? "bg-slate-700 text-white border-amber-400/80 shadow-xs font-bold"
+                        : "bg-slate-900/60 text-slate-300 border-white/[0.08] hover:bg-slate-800"
+                    }`}
+                  >
+                    <Moon className="w-3.5 h-3.5" />
+                    <span>Dark Mode</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setTheme("light")}
+                    className={`py-2.5 px-3 rounded-xl border text-xs font-semibold flex items-center justify-center gap-2 transition-all cursor-pointer ${
+                      theme === "light"
+                        ? "bg-amber-500 text-white border-amber-400 shadow-xs font-bold"
+                        : "bg-slate-900/60 text-slate-300 border-white/[0.08] hover:bg-slate-800"
+                    }`}
+                  >
+                    <Sun className="w-3.5 h-3.5 text-amber-200" />
+                    <span>Light Mode (Linen)</span>
+                  </button>
+                </div>
               </div>
 
               {/* Control 1: Text Resizing Scale (+200% maximum) */}
