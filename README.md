@@ -17,10 +17,10 @@
 ---
 
 <!-- HERO BANNER / SCREENSHOT PLACEHOLDER -->
-```
-<img src = "/screenshots/hero_preview.jpeg>
 
-```
+<img src="./screenshots/hero_preview.jpeg" alt="YojanaSetu Hero Preview" width="100%">
+
+
 <!-- Replace with actual image tag once ready: -->
 <!-- ![YojanaSetu Hero Preview](docs/screenshots/hero_preview.png) -->
 
@@ -109,47 +109,27 @@ YojanaSetu actively integrates and implements solutions tailored for the followi
 ## Interface Preview & Visual Documentation
 
 ### Voice-First Assistant & Bento Grid Hub
-```
-========================================================================================
-[ PLACEHOLDER: SCREENSHOT 1 - VOICE ASSISTANT & BENTO DASHBOARD ]
-Description: Home view highlighting the 7-bar voice equalizer, live microphone interface,
-and responsive Bento Grid cards.
-Recommended path: docs/screenshots/01_voice_assistant_bento.png
-========================================================================================
-```
+
+<img src="./screenshots/voice_assistant_bento.jpeg" alt="Voice Assistant & Bento Dashboard" width="100%">
+
 <!-- ![Voice Assistant & Bento Dashboard](docs/screenshots/01_voice_assistant_bento.png) -->
 
 ### Scheme Search Portal with Multi-Factor Demographics
-```
-========================================================================================
-[ PLACEHOLDER: SCREENSHOT 2 - SCHEME SEARCH & MULTI-FILTER PORTAL ]
-Description: The /search portal showing state dropdowns, occupation chips, category filters,
-and dynamic scheme cards with detail inspection modals.
-Recommended path: docs/screenshots/02_search_portal_filters.png
-========================================================================================
-```
+
+<img src="./screenshots/search_portal.jpeg" alt="Scheme Search Portal" width="100%">
+
 <!-- ![Scheme Search Portal](docs/screenshots/02_search_portal_filters.png) -->
 
 ### Accessibility Engine Overlay (WCAG 2.2 AAA)
-```
-========================================================================================
-[ PLACEHOLDER: SCREENSHOT 3 - ACCESSIBILITY DRAWER & HIGH CONTRAST ]
-Description: Accessibility settings drawer showcasing text enlargement, OpenDyslexic mode,
-and high-contrast display options.
-Recommended path: docs/screenshots/03_accessibility_drawer.png
-========================================================================================
-```
+
+<img src="./screenshots/accessibility.jpeg" alt="Accessibility Settings Drawer" width="100%">
+
 <!-- ![Accessibility Settings Drawer](docs/screenshots/03_accessibility_drawer.png) -->
 
 ### Scheme Deep-Dive Inspection Modal
-```
-========================================================================================
-[ PLACEHOLDER: SCREENSHOT 4 - SCHEME DETAILS & ELIGIBILITY MODAL ]
-Description: Full breakdown modal showing scheme benefits, eligibility requirements,
-application steps, and required documents.
-Recommended path: docs/screenshots/04_scheme_details_modal.png
-========================================================================================
-```
+
+<img src="./screenshots/scheme_details_modal.jpeg" alt="Scheme Details Modal" width="100%">
+
 <!-- ![Scheme Details Modal](docs/screenshots/04_scheme_details_modal.png) -->
 
 ---
