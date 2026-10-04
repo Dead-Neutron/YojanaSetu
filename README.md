@@ -116,19 +116,19 @@ YojanaSetu actively integrates and implements solutions tailored for the followi
 
 ### Scheme Search Portal with Multi-Factor Demographics
 
-<img src="./screenshots/search_portal.jpeg" alt="Scheme Search Portal" width="100%">
+<img src="./screenshots/fast.jpeg" alt="Scheme Search Portal" width="100%">
 
 <!-- ![Scheme Search Portal](docs/screenshots/02_search_portal_filters.png) -->
 
 ### Accessibility Engine Overlay (WCAG 2.2 AAA)
 
-<img src="./screenshots/accessibility.jpeg" alt="Accessibility Settings Drawer" width="100%">
+<img src="./screenshots/Accessibility12.jpeg" alt="Accessibility Settings Drawer" width="100%">
 
 <!-- ![Accessibility Settings Drawer](docs/screenshots/03_accessibility_drawer.png) -->
 
 ### Scheme Deep-Dive Inspection Modal
 
-<img src="./screenshots/scheme_details_modal.jpeg" alt="Scheme Details Modal" width="100%">
+<img src="./screenshots/Scheme Deep-Dive.jpeg" alt="Scheme Details Modal" width="100%">
 
 <!-- ![Scheme Details Modal](docs/screenshots/04_scheme_details_modal.png) -->
 
